@@ -1,0 +1,4 @@
+#include "Release.xcconfig"
+
+DART_DEFINES=COUNTRY=japan
+APP_ICON_NAME=AppIcon-Japan

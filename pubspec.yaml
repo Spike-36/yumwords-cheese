@@ -1,0 +1,149 @@
+name: yumwords_th
+description: YumWords – Vietnam
+version: 1.2.0+51
+publish_to: "none"
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  audioplayers: ^5.2.1
+  scrollable_positioned_list: ^0.3.8
+  video_player: ^2.8.6
+  shared_preferences: ^2.3.2
+  file_picker: ^10.3.2
+  path_provider: ^2.1.4
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    # -----------------------------------------
+    # Shared (global)
+    # -----------------------------------------
+    - assets/shared/images/ui/
+
+    # -----------------------------------------
+    # Vietnam (ACTIVE)
+    # -----------------------------------------
+    # - assets/vietnam/images/ui/
+    # - assets/vietnam/images/words/
+    # - assets/vietnam/audio/
+    # - assets/vietnam/data.json
+
+        # -----------------------------------------
+    # France
+    # -----------------------------------------
+    - assets/france/images/ui/
+    - assets/france/images/words/
+    - assets/france/audio/
+    - assets/france/data.json
+
+    # -----------------------------------------
+    # Thailand
+    # -----------------------------------------
+    # - assets/thailand/images/ui/
+    # - assets/thailand/images/words/
+    # - assets/thailand/audio/
+    # - assets/thailand/data.json
+
+    # -----------------------------------------
+    # Korea
+    # -----------------------------------------
+    # - assets/korea/images/ui/
+    # - assets/korea/images/words/
+    # - assets/korea/audio/
+    # - assets/korea/data.json
+
+    # -----------------------------------------
+    # Malaysia
+    # -----------------------------------------
+    # - assets/malaysia/images/ui/
+    # - assets/malaysia/images/words/
+    # - assets/malaysia/audio/
+    # - assets/malaysia/data.json
+
+    # -----------------------------------------
+    # Japan
+    # -----------------------------------------
+    # - assets/japan/images/ui/
+    # - assets/japan/images/words/
+    # - assets/japan/audio/
+    # - assets/japan/data.json
+
+    # -----------------------------------------
+    # Other
+    # -----------------------------------------
+    - assets/fonts/
+    - assets/i18n/
+
+  fonts:
+    # -----------------------------------------
+    # Display / headings (Latin only)
+    # -----------------------------------------
+    - family: BebasNeue
+      fonts:
+        - asset: assets/fonts/Bebas_Neue/BebasNeue-Regular.ttf
+
+    # -----------------------------------------
+    # Primary UI + Latin body text
+    # -----------------------------------------
+    - family: SourceSans3
+      fonts:
+        - asset: assets/fonts/SourceSans3/SourceSans3-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/SourceSans3/SourceSans3-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/SourceSans3/SourceSans3-SemiBold.ttf
+          weight: 600
+
+    # -----------------------------------------
+    # Non-Latin scripts (Vietnamese-safe)
+    # -----------------------------------------
+    - family: SourceSerif4
+      fonts:
+        - asset: assets/fonts/SourceSerif4/SourceSerif4-Regular.ttf
+
+    # -----------------------------------------
+    # Phonetics / IPA
+    # -----------------------------------------
+    - family: CharisSIL
+      fonts:
+        - asset: assets/fonts/CharisSIL/CharisSIL-Regular.ttf
+        - asset: assets/fonts/CharisSIL/CharisSIL-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/CharisSIL/CharisSIL-Italic.ttf
+          style: italic
+
+    # -----------------------------------------
+    # Legacy (kept temporarily for safety)
+    # -----------------------------------------
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter/Inter-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Inter/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter/Inter-SemiBold.ttf
+          weight: 600
+
+    - family: Sarabun
+      fonts:
+        - asset: assets/fonts/Sarabun/Sarabun-Regular.ttf
+        - asset: assets/fonts/Sarabun/Sarabun-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Sarabun/Sarabun-Italic.ttf
+          style: italic
+        - asset: assets/fonts/Sarabun/Sarabun-BoldItalic.ttf
+          weight: 700
+          style: italic
