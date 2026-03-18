@@ -141,6 +141,7 @@ class FeaturedFoodDetailScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+
                       Center(
                         child: GestureDetector(
                           onTap: () => _safePlay(context, audioPath),
@@ -156,7 +157,9 @@ class FeaturedFoodDetailScreen extends StatelessWidget {
                           ),
                         ),
                       ),
+
                       const SizedBox(height: 6),
+
                       Center(
                         child: InkWell(
                           onTap: () => _safePlay(context, audioPath),
@@ -170,6 +173,7 @@ class FeaturedFoodDetailScreen extends StatelessWidget {
                           ),
                         ),
                       ),
+
                       if (phonetic.isNotEmpty) ...[
                         const SizedBox(height: 4),
                         Center(
@@ -184,7 +188,9 @@ class FeaturedFoodDetailScreen extends StatelessWidget {
                           ),
                         ),
                       ],
+
                       const SizedBox(height: 12),
+
                       Center(
                         child: Text(
                           meaning,
@@ -214,28 +220,35 @@ class FeaturedFoodDetailScreen extends StatelessWidget {
                         _sectionLabel('Where you’ll see it', top: 36),
                         _bulletList(card.whereYouWillSeeIt),
                       ],
-                      if (card.whenItsEaten.isNotEmpty) ...[
-                        _sectionLabel('When it’s eaten'),
-                        _bulletList(card.whenItsEaten),
+
+                      if (card.regionalOrigin.isNotEmpty) ...[
+                        _sectionLabel('Regional origin'),
+                        _bulletList(card.regionalOrigin),
                       ],
+
                       if (card.howPeopleUsuallyEatIt.isNotEmpty) ...[
                         _sectionLabel('How people usually eat it'),
                         _bulletList(card.howPeopleUsuallyEatIt),
                       ],
 
-                      if (card.whyItsPopular.isNotEmpty) ...[
-                        _sectionLabel('Why it’s popular', top: 28),
-                        _bulletList(card.whyItsPopular),
+                      if (card.pairings.isNotEmpty) ...[
+                        _sectionLabel('Pairings'),
+                        _bulletList(card.pairings),
                       ],
+
                       if (card.firstImpressions.isNotEmpty) ...[
-                        _sectionLabel('First impressions'),
+                        _sectionLabel('First impressions', top: 28),
                         _bulletList(card.firstImpressions),
                       ],
 
-                      /// ✅ NEW — SPICE LEVEL (THIS WAS MISSING)
-                      if (card.infoSpiceLevel.isNotEmpty) ...[
-                        _sectionLabel('Spice level'),
-                        _bulletList(card.infoSpiceLevel),
+                      if (card.ripeness.isNotEmpty) ...[
+                        _sectionLabel('Ripeness'),
+                        _bulletList(card.ripeness),
+                      ],
+
+                      if (card.storageAndServing.isNotEmpty) ...[
+                        _sectionLabel('Storage & serving'),
+                        _bulletList(card.storageAndServing),
                       ],
 
                       if (card.goodToKnow.isNotEmpty) ...[
@@ -243,36 +256,32 @@ class FeaturedFoodDetailScreen extends StatelessWidget {
                         _bulletList(card.goodToKnow),
                       ],
 
-                      if (card.infoIngredients.isNotEmpty ||
-                          card.infoPreparation.isNotEmpty) ...[
-                        const SizedBox(height: 36),
-                        const Divider(height: 1),
-                      ],
-                      if (card.infoIngredients.isNotEmpty) ...[
-                        _sectionLabel('Ingredients', top: 24),
-                        _bulletList(card.infoIngredients),
-                      ],
-                      if (card.infoPreparation.isNotEmpty) ...[
-                        _sectionLabel('Preparation', top: 24),
+                      // ✅ NOW LAST
+                      if (card.production.isNotEmpty) ...[
+                        _sectionLabel('Production'),
                         Text(
-                          card.infoPreparation,
+                          card.production,
                           style: const TextStyle(
                             fontFamily: 'SourceSans3',
                             fontSize: 15,
                             height: 1.5,
+                            color: Colors.black87,
                           ),
                         ),
                       ],
+
                     ],
                   ),
                 ),
               ),
             ],
           ),
+
           BackButtonCommon(
             onPressed: () => Navigator.pop(context),
             topOffset: topInset + 12,
           ),
+
           Positioned(
             top: topInset + 17,
             right: 12,

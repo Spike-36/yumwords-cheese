@@ -1,6 +1,6 @@
-name: yumwords_th
-description: YumWords – Vietnam
-version: 1.2.0+51
+name: yumwords_cheese
+description: YumWords – Cheese
+version: 1.0.0+4
 publish_to: "none"
 
 environment:
@@ -32,52 +32,23 @@ flutter:
     - assets/shared/images/ui/
 
     # -----------------------------------------
-    # Vietnam (ACTIVE)
-    # -----------------------------------------
-    # - assets/vietnam/images/ui/
-    # - assets/vietnam/images/words/
-    # - assets/vietnam/audio/
-    # - assets/vietnam/data.json
-
-        # -----------------------------------------
     # France
     # -----------------------------------------
-    - assets/france/images/ui/
-    - assets/france/images/words/
-    - assets/france/audio/
-    - assets/france/data.json
+    # - assets/france/images/ui/
+    # - assets/france/images/words/
+    # - assets/france/audio/
+    # - assets/france/data.json
 
     # -----------------------------------------
-    # Thailand
+    # Cheese
     # -----------------------------------------
-    # - assets/thailand/images/ui/
-    # - assets/thailand/images/words/
-    # - assets/thailand/audio/
-    # - assets/thailand/data.json
+    - assets/cheese/images/ui/
+    - assets/cheese/images/words/
+    - assets/cheese/audio/
+    - assets/cheese/data.json
 
-    # -----------------------------------------
-    # Korea
-    # -----------------------------------------
-    # - assets/korea/images/ui/
-    # - assets/korea/images/words/
-    # - assets/korea/audio/
-    # - assets/korea/data.json
-
-    # -----------------------------------------
-    # Malaysia
-    # -----------------------------------------
-    # - assets/malaysia/images/ui/
-    # - assets/malaysia/images/words/
-    # - assets/malaysia/audio/
-    # - assets/malaysia/data.json
-
-    # -----------------------------------------
-    # Japan
-    # -----------------------------------------
-    # - assets/japan/images/ui/
-    # - assets/japan/images/words/
-    # - assets/japan/audio/
-    # - assets/japan/data.json
+   
+   
 
     # -----------------------------------------
     # Other

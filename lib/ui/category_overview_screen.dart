@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/category_types.dart';
 
-/// Category overview screen with editorial grouping metadata.
-/// NOTE:
-/// This screen is no longer responsible for navigation or Search.
-/// It exists primarily to define category structure and labels
-/// consumed by NavigatorMenuScreen.
-
 class CategoryOverviewScreen extends StatelessWidget {
   final void Function(String category) onCategorySelected;
   final String flavour;
@@ -20,42 +14,28 @@ class CategoryOverviewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    // 🔎 DEBUG — verify flavour and categories
-    final wordCategories = getCategoriesForFlavour(flavour);
-    print("FLAVOUR RECEIVED: $flavour");
-    print("WORD CATEGORIES: $wordCategories");
-
     final groups = {
-      "Essentials": const _CategoryGroup(
-        subtitle: "Some useful words, dishes, and drinks to start with.",
+
+      // 🔹 FIND (PRIMARY PURPOSE)
+      "Find Cheese": const _CategoryGroup(
+        subtitle: "Search or filter to find cheeses you enjoy.",
         categories: [
-          "Essential Words",
-          "Essential Dishes",
-          "Essential Drinks",
+          "Search",
+          "Filter by Type",
+          "Filter by Milk",
+          "Filter by Strength",
         ],
       ),
 
-      "Thai Food & Drink": const _CategoryGroup(
-        subtitle: "Information about Thai dishes, drinks, and ingredients.",
+      // 🔹 BROWSE (STRUCTURED INDEX)
+      "Browse Cheeses": const _CategoryGroup(
+        subtitle: "Explore cheeses in a structured way.",
         categories: [
-          "Dishes",
-          "Drinks",
-          "Snacks",
-          "Sweets",
-          "Basics",
-          "Vegetables",
-          "Fruits",
-          "Proteins",
-          "Nuts & Seeds",
-          "Rice, Noodles & Grains",
-          "Herbs, Aromatics & Spices",
-          "Sauces, Seasonings & Pastes",
+          "By Type",
+          "By Country",
+          "By Strength",
+          "A–Z List",
         ],
-      ),
-
-      "Words": _CategoryGroup(
-        subtitle: "Common food and drink related words and phrases.",
-        categories: wordCategories,
       ),
     };
 
@@ -68,7 +48,6 @@ class CategoryOverviewScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 12),
 
-            // --- Back button ---
             Align(
               alignment: Alignment.centerLeft,
               child: IconButton(
@@ -80,7 +59,6 @@ class CategoryOverviewScreen extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            // --- All groups + category rows ---
             for (final entry in groups.entries) ...[
               _buildGroupHeader(
                 title: entry.key,
@@ -97,7 +75,6 @@ class CategoryOverviewScreen extends StatelessWidget {
     );
   }
 
-  // --- Group header with subtitle ---
   Widget _buildGroupHeader({
     required String title,
     required String subtitle,
@@ -138,7 +115,6 @@ class CategoryOverviewScreen extends StatelessWidget {
     );
   }
 
-  // --- Tappable category row ---
   Widget _buildCategoryRow(BuildContext context, String category) {
     return Material(
       color: Colors.white,
@@ -162,7 +138,6 @@ class CategoryOverviewScreen extends StatelessWidget {
   }
 }
 
-// --- Simple model for group metadata ---
 class _CategoryGroup {
   final String subtitle;
   final List<String> categories;

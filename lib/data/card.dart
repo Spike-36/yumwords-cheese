@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 @immutable
 class Flashcard {
+
   // ============================================================
   // CORE CATEGORISATION
   // ============================================================
@@ -23,10 +24,8 @@ class Flashcard {
   final String grammarType;
   final String image;
 
-  // audio
   final String? audio;
 
-  // numeric
   final int? value;
 
   // ============================================================
@@ -35,20 +34,12 @@ class Flashcard {
 
   final String drinksType;
 
-  /// Unified field for:
-  /// - Herbs & Spices
-  /// - Aromatics & Pastes
   final String hasTypes;
 
   final String proteinTypes;
 
-  /// Unified field for:
-  /// - Sauces
-  /// - Seasonings
-  /// - Condiments
   final String sspType;
 
-  // legacy extras
   final String ipa;
   final String showIndex;
 
@@ -68,6 +59,19 @@ class Flashcard {
   final List<String> infoSpiceLevel;
   final List<String> infoIngredients;
   final String infoPreparation;
+
+  // ============================================================
+  // NEW CHEESE DATA FIELDS
+  // ============================================================
+
+  final List<String> regionalOrigin;
+  final List<String> pairings;
+  final List<String> ripeness;
+
+  // ✅ FIXED: PROSE FIELD
+  final String production;
+
+  final List<String> storageAndServing;
 
   /// Raw access if needed
   final Map<String, dynamic>? extra;
@@ -108,6 +112,15 @@ class Flashcard {
     this.infoIngredients = const [],
     this.infoPreparation = '',
 
+    this.regionalOrigin = const [],
+    this.pairings = const [],
+    this.ripeness = const [],
+
+    // ✅ FIXED DEFAULT
+    this.production = '',
+
+    this.storageAndServing = const [],
+
     this.extra,
   });
 
@@ -133,6 +146,7 @@ class Flashcard {
       return s.isNotEmpty ? [s] : [];
     }
     return [];
+
   }
 
   static List<String> _parseTags(dynamic raw) {
@@ -199,7 +213,6 @@ class Flashcard {
 
       drinksType: json['drinksType']?.toString() ?? '',
 
-      // 🔒 NORMALISED: Herbs & Spices + Aromatics & Pastes
       hasTypes:
           json['hasTypes']?.toString()
           ?? json['herbsSpicesTypes']?.toString()
@@ -208,7 +221,6 @@ class Flashcard {
 
       proteinTypes: json['proteinTypes']?.toString() ?? '',
 
-      // 🔒 NORMALISED: Condiments
       sspType:
           json['sspType']?.toString()
           ?? json['condimentsType']?.toString()
@@ -218,7 +230,8 @@ class Flashcard {
       showIndex: json['showIndex']?.toString() ?? '',
 
       infoShortDescription:
-          json['description']?.toString()
+          json['short_description']?.toString()
+          ?? json['description']?.toString()
           ?? json['infoShortDescription']?.toString()
           ?? '',
 
@@ -248,6 +261,23 @@ class Flashcard {
           json['preparation']?.toString()
           ?? json['infoPreparation']?.toString()
           ?? '',
+
+      regionalOrigin:
+          _parseStringList(json['regional_origin']),
+
+      pairings:
+          _parseStringList(json['pairings']),
+
+      ripeness:
+          _parseStringList(json['ripeness']),
+
+      // ✅ FIXED PARSING
+      production: json['production'] is List
+          ? (json['production'] as List).join('\n\n')
+          : json['production']?.toString() ?? '',
+
+      storageAndServing:
+          _parseStringList(json['storage_and_serving']),
 
       extra: json,
     );

@@ -10,7 +10,7 @@
 //   --dart-define=COUNTRY=xxx
 //
 // Valid values:
-//   japan | korea | malaysia | thailand | vietnam | france
+//   japan | korea | malaysia | thailand | vietnam | france | cheese
 //
 
 // ------------------------------------------------------------
@@ -39,8 +39,10 @@ String appTitle() {
       return 'YumWords – Thailand';
     case 'vietnam':
       return 'YumWords – Vietnam';
-    case 'france':                     // 👉 ADD THIS
+    case 'france':
       return 'YumWords – France';
+    case 'cheese':
+      return 'YumWords – Cheese';
 
     default:
       return 'YumWords';
