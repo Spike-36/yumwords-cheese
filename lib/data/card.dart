@@ -68,6 +68,12 @@ class Flashcard {
   final List<String> pairings;
   final List<String> ripeness;
 
+  // ✅ NEW FILTER FIELDS ADDED
+  final String country;
+  final String milk;
+  final String strength;
+  final String rind;
+
   // ✅ FIXED: PROSE FIELD
   final String production;
 
@@ -116,6 +122,12 @@ class Flashcard {
     this.pairings = const [],
     this.ripeness = const [],
 
+    // ✅ NEW DEFAULTS
+    this.country = '',
+    this.milk = '',
+    this.strength = '',
+    this.rind = '',
+
     // ✅ FIXED DEFAULT
     this.production = '',
 
@@ -146,7 +158,6 @@ class Flashcard {
       return s.isNotEmpty ? [s] : [];
     }
     return [];
-
   }
 
   static List<String> _parseTags(dynamic raw) {
@@ -270,6 +281,12 @@ class Flashcard {
 
       ripeness:
           _parseStringList(json['ripeness']),
+
+      // ✅ NEW FIELD MAPPING
+      country: json['country']?.toString().toLowerCase() ?? '',
+      milk: json['milk']?.toString().toLowerCase() ?? '',
+      strength: json['strength']?.toString().toLowerCase() ?? '',
+      rind: json['rind']?.toString().toLowerCase() ?? '',
 
       // ✅ FIXED PARSING
       production: json['production'] is List

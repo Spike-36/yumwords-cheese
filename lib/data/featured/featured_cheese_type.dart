@@ -1,4 +1,4 @@
-const Map<String, List<String>> featuredSectionsCheese = {
+const Map<String, List<String>> featuredSectionsCheeseByType = {
 
   // =========================================================
   // Fresh Cheeses

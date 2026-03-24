@@ -6,21 +6,36 @@ import 'widgets/back_button_common.dart';
 import 'widgets/circle_icon_button.dart';
 import 'navigator_menu_screen.dart';
 
-class FeaturedFoodDetailScreen extends StatelessWidget {
-  final Flashcard card;
-  final AudioService audio;
+class FeaturedFoodDetailScreen extends StatefulWidget {
+  final int index;
   final List<Flashcard> cards;
+  final AudioService audio;
   final String languageCode;
   final bool autoAudio;
 
   const FeaturedFoodDetailScreen({
     super.key,
-    required this.card,
-    required this.audio,
+    required this.index,
     required this.cards,
+    required this.audio,
     this.languageCode = 'en',
     this.autoAudio = false,
   });
+
+  @override
+  State<FeaturedFoodDetailScreen> createState() =>
+      _FeaturedFoodDetailScreenState();
+}
+
+class _FeaturedFoodDetailScreenState
+    extends State<FeaturedFoodDetailScreen> {
+  late PageController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = PageController(initialPage: widget.index);
+  }
 
   String _audioPath(String? filename) {
     final f = (filename ?? '').trim();
@@ -35,7 +50,7 @@ class FeaturedFoodDetailScreen extends StatelessWidget {
   Future<void> _safePlay(BuildContext context, String path) async {
     if (path.isEmpty) return;
     try {
-      await audio.playAsset(path);
+      await widget.audio.playAsset(path);
     } catch (_) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -52,10 +67,10 @@ class FeaturedFoodDetailScreen extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (_) => NavigatorMenuScreen(
-          cards: cards,
-          audio: audio,
-          languageCode: languageCode,
-          autoAudio: autoAudio,
+          cards: widget.cards,
+          audio: widget.audio,
+          languageCode: widget.languageCode,
+          autoAudio: widget.autoAudio,
         ),
       ),
     );
@@ -104,15 +119,16 @@ class FeaturedFoodDetailScreen extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildPage(BuildContext context, int index) {
+    final card = widget.cards[index];
+
     final imgH = MediaQuery.of(context).size.height * 0.45;
     final topInset = MediaQuery.of(context).padding.top;
 
     final hw = card.headword.trim();
     final hwFont = _isNonLatin(hw) ? 'SourceSerif4' : 'BebasNeue';
 
-    final meaning = card.meaningFor(languageCode);
+    final meaning = card.meaningFor(widget.languageCode);
     final phonetic = card.phonetic.trim();
 
     final imgPath = _imagePath(card.image);
@@ -120,177 +136,196 @@ class FeaturedFoodDetailScreen extends StatelessWidget {
 
     final shortDesc = card.infoShortDescription.trim();
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                automaticallyImplyLeading: false,
-                expandedHeight: imgH,
-                backgroundColor: Colors.black,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: imgPath.isEmpty
-                      ? Container(color: Colors.black12)
-                      : Image.asset(imgPath, fit: BoxFit.cover),
-                ),
+    return Stack(
+      children: [
+        CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              automaticallyImplyLeading: false,
+              expandedHeight: imgH,
+              backgroundColor: Colors.black,
+              flexibleSpace: FlexibleSpaceBar(
+                background: imgPath.isEmpty
+                    ? Container(color: Colors.black12)
+                    : Image.asset(imgPath, fit: BoxFit.cover),
               ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 20, 24, 48),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding:
+                    const EdgeInsets.fromLTRB(24, 20, 24, 48),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
 
-                      Center(
-                        child: GestureDetector(
-                          onTap: () => _safePlay(context, audioPath),
-                          child: Text(
-                            hw,
-                            style: TextStyle(
-                              fontFamily: hwFont,
-                              fontSize: 30,
-                              letterSpacing:
-                                  hwFont == 'BebasNeue' ? 0.04 : null,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 6),
-
-                      Center(
-                        child: InkWell(
-                          onTap: () => _safePlay(context, audioPath),
-                          child: const Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Icon(
-                              Icons.volume_up,
-                              size: 32,
-                              color: Colors.black38,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      if (phonetic.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Center(
-                          child: Text(
-                            "[$phonetic]",
-                            style: const TextStyle(
-                              fontFamily: 'CharisSIL',
-                              fontSize: 16,
-                              fontStyle: FontStyle.italic,
-                              color: Colors.deepOrange,
-                            ),
-                          ),
-                        ),
-                      ],
-
-                      const SizedBox(height: 12),
-
-                      Center(
+                    Center(
+                      child: GestureDetector(
+                        onTap: () =>
+                            _safePlay(context, audioPath),
                         child: Text(
-                          meaning,
-                          style: const TextStyle(
-                            fontFamily: 'SourceSans3',
-                            fontSize: 22,
-                            fontWeight: FontWeight.w600,
+                          hw,
+                          style: TextStyle(
+                            fontFamily: hwFont,
+                            fontSize: 30,
+                            letterSpacing: hwFont ==
+                                    'BebasNeue'
+                                ? 0.04
+                                : null,
                           ),
                           textAlign: TextAlign.center,
                         ),
                       ),
+                    ),
 
-                      if (shortDesc.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        Text(
-                          shortDesc,
+                    const SizedBox(height: 6),
+
+                    Center(
+                      child: InkWell(
+                        onTap: () =>
+                            _safePlay(context, audioPath),
+                        child: const Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Icon(
+                            Icons.volume_up,
+                            size: 32,
+                            color: Colors.black38,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    if (phonetic.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Center(
+                        child: Text(
+                          "[$phonetic]",
                           style: const TextStyle(
-                            fontFamily: 'SourceSans3',
+                            fontFamily: 'CharisSIL',
                             fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            height: 1.45,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.deepOrange,
                           ),
                         ),
-                      ],
-
-                      if (card.whereYouWillSeeIt.isNotEmpty) ...[
-                        _sectionLabel('Where you’ll see it', top: 36),
-                        _bulletList(card.whereYouWillSeeIt),
-                      ],
-
-                      if (card.regionalOrigin.isNotEmpty) ...[
-                        _sectionLabel('Regional origin'),
-                        _bulletList(card.regionalOrigin),
-                      ],
-
-                      if (card.howPeopleUsuallyEatIt.isNotEmpty) ...[
-                        _sectionLabel('How people usually eat it'),
-                        _bulletList(card.howPeopleUsuallyEatIt),
-                      ],
-
-                      if (card.pairings.isNotEmpty) ...[
-                        _sectionLabel('Pairings'),
-                        _bulletList(card.pairings),
-                      ],
-
-                      if (card.firstImpressions.isNotEmpty) ...[
-                        _sectionLabel('First impressions', top: 28),
-                        _bulletList(card.firstImpressions),
-                      ],
-
-                      if (card.ripeness.isNotEmpty) ...[
-                        _sectionLabel('Ripeness'),
-                        _bulletList(card.ripeness),
-                      ],
-
-                      if (card.storageAndServing.isNotEmpty) ...[
-                        _sectionLabel('Storage & serving'),
-                        _bulletList(card.storageAndServing),
-                      ],
-
-                      if (card.goodToKnow.isNotEmpty) ...[
-                        _sectionLabel('Good to know'),
-                        _bulletList(card.goodToKnow),
-                      ],
-
-                      // ✅ NOW LAST
-                      if (card.production.isNotEmpty) ...[
-                        _sectionLabel('Production'),
-                        Text(
-                          card.production,
-                          style: const TextStyle(
-                            fontFamily: 'SourceSans3',
-                            fontSize: 15,
-                            height: 1.5,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
-
+                      ),
                     ],
-                  ),
+
+                    const SizedBox(height: 12),
+
+                    Center(
+                      child: Text(
+                        meaning,
+                        style: const TextStyle(
+                          fontFamily: 'SourceSans3',
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+
+                    if (shortDesc.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        shortDesc,
+                        style: const TextStyle(
+                          fontFamily: 'SourceSans3',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          height: 1.45,
+                        ),
+                      ),
+                    ],
+
+                    if (card.whereYouWillSeeIt.isNotEmpty) ...[
+                      _sectionLabel('Where you’ll see it',
+                          top: 36),
+                      _bulletList(card.whereYouWillSeeIt),
+                    ],
+
+                    if (card.regionalOrigin.isNotEmpty) ...[
+                      _sectionLabel('Regional origin'),
+                      _bulletList(card.regionalOrigin),
+                    ],
+
+                    if (card.howPeopleUsuallyEatIt.isNotEmpty) ...[
+                      _sectionLabel(
+                          'How people usually eat it'),
+                      _bulletList(
+                          card.howPeopleUsuallyEatIt),
+                    ],
+
+                    if (card.pairings.isNotEmpty) ...[
+                      _sectionLabel('Pairings'),
+                      _bulletList(card.pairings),
+                    ],
+
+                    if (card.firstImpressions.isNotEmpty) ...[
+                      _sectionLabel('First impressions',
+                          top: 28),
+                      _bulletList(card.firstImpressions),
+                    ],
+
+                    if (card.ripeness.isNotEmpty) ...[
+                      _sectionLabel('Ripeness'),
+                      _bulletList(card.ripeness),
+                    ],
+
+                    if (card.storageAndServing.isNotEmpty) ...[
+                      _sectionLabel('Storage & serving'),
+                      _bulletList(
+                          card.storageAndServing),
+                    ],
+
+                    if (card.goodToKnow.isNotEmpty) ...[
+                      _sectionLabel('Good to know'),
+                      _bulletList(card.goodToKnow),
+                    ],
+
+                    if (card.production.isNotEmpty) ...[
+                      _sectionLabel('Production'),
+                      Text(
+                        card.production,
+                        style: const TextStyle(
+                          fontFamily: 'SourceSans3',
+                          fontSize: 15,
+                          height: 1.5,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-            ],
-          ),
-
-          BackButtonCommon(
-            onPressed: () => Navigator.pop(context),
-            topOffset: topInset + 12,
-          ),
-
-          Positioned(
-            top: topInset + 17,
-            right: 12,
-            child: CircleIconButton(
-              icon: Icons.search,
-              onPressed: () => _openNavigatorMenu(context),
             ),
+          ],
+        ),
+
+        BackButtonCommon(
+          onPressed: () => Navigator.pop(context),
+          topOffset: topInset + 12,
+        ),
+
+        Positioned(
+          top: topInset + 17,
+          right: 12,
+          child: CircleIconButton(
+            icon: Icons.search,
+            onPressed: () =>
+                _openNavigatorMenu(context),
           ),
-        ],
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: PageView.builder(
+        controller: _controller,
+        itemCount: widget.cards.length,
+        itemBuilder: (context, index) {
+          return _buildPage(context, index);
+        },
       ),
     );
   }
