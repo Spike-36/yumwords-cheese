@@ -173,14 +173,12 @@ class _FeaturedFoodDetailScreenState
     final topInset = MediaQuery.of(context).padding.top;
 
     final hw = card.headword.trim();
-    final hwFont = 'BebasNeue'; // 👉 FIXED
+    final hwFont = 'BebasNeue';
 
-    final meaning = card.meaningFor(widget.languageCode);
     final phonetic = card.phonetic.trim();
 
     final imgPath = _imagePath(card.image);
     final audioPath = _audioPath(card.audio);
-    final flag = _flagPath(card.country);
 
     final shortDesc = card.infoShortDescription.trim();
 
@@ -204,49 +202,39 @@ class _FeaturedFoodDetailScreenState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    GestureDetector(
+                      onTap: () => _safePlay(context, audioPath),
+                      child: SizedBox(
+                        height: 44,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Center(
+                              child: Text(
+                                hw,
+                                style: TextStyle(
+                                  fontFamily: hwFont,
+                                  fontSize: 30,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
 
-                    Center(
-                      child: GestureDetector(
-                        onTap: () => _safePlay(context, audioPath),
-                        child: Text(
-                          hw,
-                          style: TextStyle(
-                            fontFamily: hwFont,
-                            fontSize: 30,
-                          ),
-                          textAlign: TextAlign.center,
+                            const Positioned(
+                              right: 0,
+                               top: 11,
+                              child: Icon(
+                                Icons.volume_up,
+                                size: 28,
+                                color: Colors.black26,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-
-                    if (flag.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: Center(
-                          child: Image.asset(
-                            flag,
-                            width: 28,
-                            height: 28,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
 
                     const SizedBox(height: 6),
-
-                    Center(
-                      child: InkWell(
-                        onTap: () => _safePlay(context, audioPath),
-                        child: const Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Icon(
-                            Icons.volume_up,
-                            size: 32,
-                            color: Colors.black38,
-                          ),
-                        ),
-                      ),
-                    ),
 
                     if (phonetic.isNotEmpty)
                       Center(
@@ -256,24 +244,12 @@ class _FeaturedFoodDetailScreenState
                             fontFamily: 'CharisSIL',
                             fontSize: 16,
                             fontStyle: FontStyle.italic,
-                            color: Colors.deepOrange,
+                            color: Colors.grey,
                           ),
                         ),
                       ),
 
-                    const SizedBox(height: 12),
-
-                    Center(
-                      child: Text(
-                        meaning,
-                        style: const TextStyle(
-                          fontFamily: 'SourceSans3',
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
+                    const SizedBox(height: 10),
 
                     if (shortDesc.isNotEmpty)
                       Padding(
