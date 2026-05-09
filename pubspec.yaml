@@ -26,47 +26,31 @@ flutter:
   uses-material-design: true
 
   assets:
-    # -----------------------------------------
     # Shared (global)
-    # -----------------------------------------
     - assets/shared/images/ui/
+    - assets/shared/flags/
 
-    # -----------------------------------------
     # France
-    # -----------------------------------------
     # - assets/france/images/ui/
     # - assets/france/images/words/
     # - assets/france/audio/
     # - assets/france/data.json
 
-    # -----------------------------------------
     # Cheese
-    # -----------------------------------------
     - assets/cheese/images/ui/
     - assets/cheese/images/words/
     - assets/cheese/audio/
     - assets/cheese/data.json
 
-   
-   
-
-    # -----------------------------------------
     # Other
-    # -----------------------------------------
     - assets/fonts/
     - assets/i18n/
 
   fonts:
-    # -----------------------------------------
-    # Display / headings (Latin only)
-    # -----------------------------------------
     - family: BebasNeue
       fonts:
         - asset: assets/fonts/Bebas_Neue/BebasNeue-Regular.ttf
 
-    # -----------------------------------------
-    # Primary UI + Latin body text
-    # -----------------------------------------
     - family: SourceSans3
       fonts:
         - asset: assets/fonts/SourceSans3/SourceSans3-Regular.ttf
@@ -76,16 +60,10 @@ flutter:
         - asset: assets/fonts/SourceSans3/SourceSans3-SemiBold.ttf
           weight: 600
 
-    # -----------------------------------------
-    # Non-Latin scripts (Vietnamese-safe)
-    # -----------------------------------------
     - family: SourceSerif4
       fonts:
         - asset: assets/fonts/SourceSerif4/SourceSerif4-Regular.ttf
 
-    # -----------------------------------------
-    # Phonetics / IPA
-    # -----------------------------------------
     - family: CharisSIL
       fonts:
         - asset: assets/fonts/CharisSIL/CharisSIL-Regular.ttf
@@ -94,9 +72,6 @@ flutter:
         - asset: assets/fonts/CharisSIL/CharisSIL-Italic.ttf
           style: italic
 
-    # -----------------------------------------
-    # Legacy (kept temporarily for safety)
-    # -----------------------------------------
     - family: Inter
       fonts:
         - asset: assets/fonts/Inter/Inter-Thin.ttf

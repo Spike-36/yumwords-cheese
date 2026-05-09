@@ -37,6 +37,56 @@ class _FeaturedFoodDetailScreenState
     _controller = PageController(initialPage: widget.index);
   }
 
+  String _flagPath(String country) {
+    switch (country.toLowerCase().trim()) {
+      case 'france':
+        return 'assets/shared/flags/france.png';
+      case 'italy':
+        return 'assets/shared/flags/italy.png';
+      case 'spain':
+        return 'assets/shared/flags/spain.png';
+      case 'uk':
+      case 'united kingdom':
+        return 'assets/shared/flags/uk.png';
+      case 'ireland':
+        return 'assets/shared/flags/ireland.png';
+      case 'switzerland':
+        return 'assets/shared/flags/switzerland.png';
+      case 'netherlands':
+        return 'assets/shared/flags/netherlands.png';
+      case 'belgium':
+        return 'assets/shared/flags/belgium.png';
+      case 'germany':
+        return 'assets/shared/flags/germany.png';
+      case 'austria':
+        return 'assets/shared/flags/austria.png';
+      case 'portugal':
+        return 'assets/shared/flags/portugal.png';
+      case 'greece':
+        return 'assets/shared/flags/greece.png';
+      case 'denmark':
+        return 'assets/shared/flags/denmark.png';
+      case 'norway':
+        return 'assets/shared/flags/norway.png';
+      case 'sweden':
+        return 'assets/shared/flags/sweden.png';
+      case 'finland':
+        return 'assets/shared/flags/finland.png';
+      case 'romania':
+        return 'assets/shared/flags/romania.png';
+      case 'turkey':
+        return 'assets/shared/flags/turkey.png';
+      case 'bulgaria':
+        return 'assets/shared/flags/bulgaria.png';
+      case 'slovakia':
+        return 'assets/shared/flags/slovakia.png';
+      case 'poland':
+        return 'assets/shared/flags/poland.png';
+      default:
+        return '';
+    }
+  }
+
   String _audioPath(String? filename) {
     final f = (filename ?? '').trim();
     return f.isEmpty ? '' : audioCountryPath(f);
@@ -58,9 +108,6 @@ class _FeaturedFoodDetailScreenState
       );
     }
   }
-
-  bool _isNonLatin(String text) =>
-      RegExp(r'[^\u0000-\u007F]').hasMatch(text);
 
   void _openNavigatorMenu(BuildContext context) {
     Navigator.push(
@@ -126,13 +173,14 @@ class _FeaturedFoodDetailScreenState
     final topInset = MediaQuery.of(context).padding.top;
 
     final hw = card.headword.trim();
-    final hwFont = _isNonLatin(hw) ? 'SourceSerif4' : 'BebasNeue';
+    final hwFont = 'BebasNeue'; // 👉 FIXED
 
     final meaning = card.meaningFor(widget.languageCode);
     final phonetic = card.phonetic.trim();
 
     final imgPath = _imagePath(card.image);
     final audioPath = _audioPath(card.audio);
+    final flag = _flagPath(card.country);
 
     final shortDesc = card.infoShortDescription.trim();
 
@@ -152,37 +200,43 @@ class _FeaturedFoodDetailScreenState
             ),
             SliverToBoxAdapter(
               child: Padding(
-                padding:
-                    const EdgeInsets.fromLTRB(24, 20, 24, 48),
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 48),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
                     Center(
                       child: GestureDetector(
-                        onTap: () =>
-                            _safePlay(context, audioPath),
+                        onTap: () => _safePlay(context, audioPath),
                         child: Text(
                           hw,
                           style: TextStyle(
                             fontFamily: hwFont,
                             fontSize: 30,
-                            letterSpacing: hwFont ==
-                                    'BebasNeue'
-                                ? 0.04
-                                : null,
                           ),
                           textAlign: TextAlign.center,
                         ),
                       ),
                     ),
 
+                    if (flag.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Center(
+                          child: Image.asset(
+                            flag,
+                            width: 28,
+                            height: 28,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+
                     const SizedBox(height: 6),
 
                     Center(
                       child: InkWell(
-                        onTap: () =>
-                            _safePlay(context, audioPath),
+                        onTap: () => _safePlay(context, audioPath),
                         child: const Padding(
                           padding: EdgeInsets.all(8),
                           child: Icon(
@@ -194,8 +248,7 @@ class _FeaturedFoodDetailScreenState
                       ),
                     ),
 
-                    if (phonetic.isNotEmpty) ...[
-                      const SizedBox(height: 4),
+                    if (phonetic.isNotEmpty)
                       Center(
                         child: Text(
                           "[$phonetic]",
@@ -207,7 +260,6 @@ class _FeaturedFoodDetailScreenState
                           ),
                         ),
                       ),
-                    ],
 
                     const SizedBox(height: 12),
 
@@ -223,22 +275,14 @@ class _FeaturedFoodDetailScreenState
                       ),
                     ),
 
-                    if (shortDesc.isNotEmpty) ...[
-                      const SizedBox(height: 12),
-                      Text(
-                        shortDesc,
-                        style: const TextStyle(
-                          fontFamily: 'SourceSans3',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          height: 1.45,
-                        ),
+                    if (shortDesc.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Text(shortDesc),
                       ),
-                    ],
 
                     if (card.whereYouWillSeeIt.isNotEmpty) ...[
-                      _sectionLabel('Where you’ll see it',
-                          top: 36),
+                      _sectionLabel('Where you’ll see it', top: 36),
                       _bulletList(card.whereYouWillSeeIt),
                     ],
 
@@ -248,10 +292,8 @@ class _FeaturedFoodDetailScreenState
                     ],
 
                     if (card.howPeopleUsuallyEatIt.isNotEmpty) ...[
-                      _sectionLabel(
-                          'How people usually eat it'),
-                      _bulletList(
-                          card.howPeopleUsuallyEatIt),
+                      _sectionLabel('How people usually eat it'),
+                      _bulletList(card.howPeopleUsuallyEatIt),
                     ],
 
                     if (card.pairings.isNotEmpty) ...[
@@ -260,8 +302,7 @@ class _FeaturedFoodDetailScreenState
                     ],
 
                     if (card.firstImpressions.isNotEmpty) ...[
-                      _sectionLabel('First impressions',
-                          top: 28),
+                      _sectionLabel('First impressions', top: 28),
                       _bulletList(card.firstImpressions),
                     ],
 
@@ -272,8 +313,7 @@ class _FeaturedFoodDetailScreenState
 
                     if (card.storageAndServing.isNotEmpty) ...[
                       _sectionLabel('Storage & serving'),
-                      _bulletList(
-                          card.storageAndServing),
+                      _bulletList(card.storageAndServing),
                     ],
 
                     if (card.goodToKnow.isNotEmpty) ...[
@@ -283,14 +323,7 @@ class _FeaturedFoodDetailScreenState
 
                     if (card.production.isNotEmpty) ...[
                       _sectionLabel('Production'),
-                      Text(
-                        card.production,
-                        style: const TextStyle(
-                          fontFamily: 'SourceSans3',
-                          fontSize: 15,
-                          height: 1.5,
-                        ),
-                      ),
+                      Text(card.production),
                     ],
                   ],
                 ),
@@ -309,8 +342,7 @@ class _FeaturedFoodDetailScreenState
           right: 12,
           child: CircleIconButton(
             icon: Icons.search,
-            onPressed: () =>
-                _openNavigatorMenu(context),
+            onPressed: () => _openNavigatorMenu(context),
           ),
         ),
       ],

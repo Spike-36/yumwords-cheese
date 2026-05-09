@@ -85,7 +85,7 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
       MaterialPageRoute(
         builder: (_) => FeaturedFoodDetailScreen(
           index: index, // 👉 correct
-          cards: list,  // 👉 correct dataset
+          cards: list, // 👉 correct dataset
           audio: widget.audio,
           languageCode: widget.languageCode,
           autoAudio: widget.autoAudio,
@@ -101,46 +101,95 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
+
       appBar: AppBar(
-        title: Text(
-          appTitle(),
-          style: const TextStyle(
-            fontFamily: 'BebasNeue',
-            fontSize: 28,
-            letterSpacing: 0.08,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ToggleButtons(
-              isSelected: [mode == 'type', mode == 'country'],
-              onPressed: (index) {
-                setState(() {
-                  mode = index == 0 ? 'type' : 'country';
-                });
-              },
-              children: const [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('TYPE'),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('COUNTRY'),
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.black54),
-            onPressed: () => _openNavigatorMenu(context),
-          ),
-        ],
+        toolbarHeight: 120,
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
+
+        title: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 👉 top heading row with fixed centred title
+            SizedBox(
+              height: 36,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Center(
+                    child: Text(
+                      appTitle(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontFamily: 'BebasNeue',
+                        fontSize: 28,
+                        letterSpacing: 0.08,
+                      ),
+                    ),
+                  ),
+
+                  Positioned(
+                    right: -10, // 👉 preserved
+                    top: -3, // 👉 preserved
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.search,
+                        color: Colors.black54,
+                      ),
+                      onPressed: () => _openNavigatorMenu(context),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            // 👉 segmented controls row
+            Transform.translate(
+              offset: const Offset(18, 8), // 👉 adjusted
+              child: SizedBox(
+                width: 260,
+                child: ToggleButtons(
+                  constraints: const BoxConstraints(
+                    minWidth: 110,
+                    minHeight: 36,
+                  ),
+                  isSelected: [mode == 'country', mode == 'type'],
+                  onPressed: (index) {
+                    setState(() {
+                      mode = index == 0 ? 'country' : 'type';
+                    });
+                  },
+                  children: const [
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 0),
+                      child: Text(
+                        'REGIONS',
+                        style: TextStyle(
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 0),
+                      child: Text(
+                        'TYPES',
+                        style: TextStyle(
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
+
       body: ListView(
         children: sectionList.asMap().entries.map((entry) {
           final sectionIndex = entry.key;
@@ -156,6 +205,7 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
               : _layoutRules.last;
 
           final heroCards = sectionCards.take(rule.heroCount).toList();
+
           final gridCards = sectionCards
               .skip(rule.heroCount)
               .take(rule.gridCount)
@@ -185,14 +235,17 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
                 return Padding(
                   padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
                   child: GestureDetector(
-                    onTap: () => _openCard(context, heroCards, index), // 👉 FIXED
+                    onTap: () => _openCard(context, heroCards, index),
+
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
+
                           child: AspectRatio(
                             aspectRatio: 1,
+
                             child: Image.asset(
                               imageCountryPath(card.image),
                               width: double.infinity,
@@ -200,11 +253,14 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
                             ),
                           ),
                         ),
+
                         const SizedBox(height: 6),
+
                         Text(
                           card.headword,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
+
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -220,10 +276,12 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
               if (gridCards.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
+
                   child: GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: gridCards.length,
+
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
@@ -231,18 +289,21 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
                       mainAxisSpacing: 12,
                       childAspectRatio: 0.85,
                     ),
+
                     itemBuilder: (context, index) {
                       final card = gridCards[index];
 
                       return GestureDetector(
                         onTap: () =>
-                            _openCard(context, gridCards, index), // 👉 FIXED
+                            _openCard(context, gridCards, index),
+
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
+
                                 child: Image.asset(
                                   imageCountryPath(card.image),
                                   width: double.infinity,
@@ -250,11 +311,14 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
                                 ),
                               ),
                             ),
+
                             const SizedBox(height: 6),
+
                             Text(
                               card.headword,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
+
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,

@@ -1,20 +1,9 @@
 const Map<String, List<String>> featuredSectionsCheeseByCountry = {
 
   // =========================================================
-  // France
+  // Normandy & Northern France
   // =========================================================
-  'France': [
-    'CH001', // camembert
-    'CH003', // comté
-    'CH004', // roquefort
-    'CH006', // reblochon
-    'CH021', // époisses
-  ],
-
-  // =========================================================
-  // Italy (placeholder)
-  // =========================================================
-  'Italy': [
+  'Normandy & Northern France': [
     'CH001',
     'CH003',
     'CH004',
@@ -23,9 +12,9 @@ const Map<String, List<String>> featuredSectionsCheeseByCountry = {
   ],
 
   // =========================================================
-  // Spain (placeholder)
+  // Paris & Central Northern France
   // =========================================================
-  'Spain': [
+  'Paris & Central Northern France': [
     'CH001',
     'CH003',
     'CH004',
@@ -34,9 +23,9 @@ const Map<String, List<String>> featuredSectionsCheeseByCountry = {
   ],
 
   // =========================================================
-  // Switzerland (placeholder)
+  // Burgundy, Jura & Eastern France
   // =========================================================
-  'Switzerland': [
+  'Burgundy, Jura & Eastern France': [
     'CH001',
     'CH003',
     'CH004',
@@ -45,9 +34,53 @@ const Map<String, List<String>> featuredSectionsCheeseByCountry = {
   ],
 
   // =========================================================
-  // United Kingdom (placeholder)
+  // Alps & Savoie
   // =========================================================
-  'United Kingdom': [
+  'Alps & Savoie': [
+    'CH001',
+    'CH003',
+    'CH004',
+    'CH006',
+    'CH021',
+  ],
+
+  // =========================================================
+  // Auvergne & Central Mountains
+  // =========================================================
+  'Auvergne & Central Mountains': [
+    'CH001',
+    'CH003',
+    'CH004',
+    'CH006',
+    'CH021',
+  ],
+
+  // =========================================================
+  // Loire Valley & Western France
+  // =========================================================
+  'Loire Valley & Western France': [
+    'CH001',
+    'CH003',
+    'CH004',
+    'CH006',
+    'CH021',
+  ],
+
+  // =========================================================
+  // Southwest & Pyrenees
+  // =========================================================
+  'Southwest & Pyrenees': [
+    'CH001',
+    'CH003',
+    'CH004',
+    'CH006',
+    'CH021',
+  ],
+
+  // =========================================================
+  // Mediterranean South & Corsica
+  // =========================================================
+  'Mediterranean South & Corsica': [
     'CH001',
     'CH003',
     'CH004',
