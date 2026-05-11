@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+
 import '../data/card.dart';
 import '../services/audio_service.dart';
 import '../config/flavour.dart';
 import 'widgets/back_button_common.dart';
 import 'widgets/circle_icon_button.dart';
+import 'widgets/strength_guide_sheet.dart';
+import 'widgets/cheese_meta_row.dart';
 import 'navigator_menu_screen.dart';
 
 class FeaturedFoodDetailScreen extends StatefulWidget {
@@ -99,12 +102,16 @@ class _FeaturedFoodDetailScreenState
 
   Future<void> _safePlay(BuildContext context, String path) async {
     if (path.isEmpty) return;
+
     try {
       await widget.audio.playAsset(path);
     } catch (_) {
       if (!context.mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Audio not available')),
+        const SnackBar(
+          content: Text('Audio not available'),
+        ),
       );
     }
   }
@@ -125,12 +132,15 @@ class _FeaturedFoodDetailScreenState
 
   Widget _sectionLabel(String text, {double top = 20}) {
     return Padding(
-      padding: EdgeInsets.only(top: top, bottom: 4),
+      padding: EdgeInsets.only(
+        top: top,
+        bottom: 4,
+      ),
       child: Text(
         text,
         style: const TextStyle(
           fontFamily: 'SourceSans3',
-          fontSize: 14,
+          fontSize: 12,
           fontWeight: FontWeight.w600,
           color: Colors.black87,
         ),
@@ -148,6 +158,7 @@ class _FeaturedFoodDetailScreenState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('•  '),
+
               Expanded(
                 child: Text(
                   item,
@@ -169,18 +180,30 @@ class _FeaturedFoodDetailScreenState
   Widget _buildPage(BuildContext context, int index) {
     final card = widget.cards[index];
 
-    final imgH = MediaQuery.of(context).size.height * 0.45;
-    final topInset = MediaQuery.of(context).padding.top;
+    final imgH =
+        MediaQuery.of(context).size.height * 0.45;
+
+    final topInset =
+        MediaQuery.of(context).padding.top;
 
     final hw = card.headword.trim();
+
     final hwFont = 'BebasNeue';
 
     final phonetic = card.phonetic.trim();
 
     final imgPath = _imagePath(card.image);
+
     final audioPath = _audioPath(card.audio);
 
-    final shortDesc = card.infoShortDescription.trim();
+    final shortDesc =
+        card.infoShortDescription.trim();
+
+    // 👉 TEMP
+    final strength = '3';
+
+    // 👉 TEMP
+    final milkType = 'Cow';
 
     return Stack(
       children: [
@@ -192,18 +215,34 @@ class _FeaturedFoodDetailScreenState
               backgroundColor: Colors.black,
               flexibleSpace: FlexibleSpaceBar(
                 background: imgPath.isEmpty
-                    ? Container(color: Colors.black12)
-                    : Image.asset(imgPath, fit: BoxFit.cover),
+                    ? Container(
+                        color: Colors.black12,
+                      )
+                    : Image.asset(
+                        imgPath,
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
+
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 20, 24, 48),
+                padding: const EdgeInsets.fromLTRB(
+                  24,
+                  20,
+                  24,
+                  48,
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
                   children: [
                     GestureDetector(
-                      onTap: () => _safePlay(context, audioPath),
+                      onTap: () =>
+                          _safePlay(
+                            context,
+                            audioPath,
+                          ),
                       child: SizedBox(
                         height: 44,
                         child: Stack(
@@ -216,13 +255,14 @@ class _FeaturedFoodDetailScreenState
                                   fontFamily: hwFont,
                                   fontSize: 30,
                                 ),
-                                textAlign: TextAlign.center,
+                                textAlign:
+                                    TextAlign.center,
                               ),
                             ),
 
                             const Positioned(
                               right: 0,
-                               top: 11,
+                              top: 6,
                               child: Icon(
                                 Icons.volume_up,
                                 size: 28,
@@ -243,7 +283,8 @@ class _FeaturedFoodDetailScreenState
                           style: const TextStyle(
                             fontFamily: 'CharisSIL',
                             fontSize: 16,
-                            fontStyle: FontStyle.italic,
+                            fontStyle:
+                                FontStyle.italic,
                             color: Colors.grey,
                           ),
                         ),
@@ -251,54 +292,124 @@ class _FeaturedFoodDetailScreenState
 
                     const SizedBox(height: 10),
 
+                    CheeseMetaRow(
+                      milkType: milkType,
+                      strength: strength,
+
+                      onMapTap: () {},
+
+                      onStrengthTap: () {
+                        showStrengthGuideSheet(
+                          context,
+                          strength,
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 18),
+
                     if (shortDesc.isNotEmpty)
                       Padding(
-                        padding: const EdgeInsets.only(top: 12),
+                        padding:
+                            const EdgeInsets.only(
+                          top: 12,
+                        ),
                         child: Text(shortDesc),
                       ),
 
-                    if (card.whereYouWillSeeIt.isNotEmpty) ...[
-                      _sectionLabel('Where you’ll see it', top: 36),
-                      _bulletList(card.whereYouWillSeeIt),
+                    if (card.whereYouWillSeeIt
+                        .isNotEmpty) ...[
+                      _sectionLabel(
+                        'Where you’ll see it',
+                        top: 36,
+                      ),
+
+                      _bulletList(
+                        card.whereYouWillSeeIt,
+                      ),
                     ],
 
-                    if (card.regionalOrigin.isNotEmpty) ...[
-                      _sectionLabel('Regional origin'),
-                      _bulletList(card.regionalOrigin),
+                    if (card.regionalOrigin
+                        .isNotEmpty) ...[
+                      _sectionLabel(
+                        'Regional origin',
+                      ),
+
+                      _bulletList(
+                        card.regionalOrigin,
+                      ),
                     ],
 
-                    if (card.howPeopleUsuallyEatIt.isNotEmpty) ...[
-                      _sectionLabel('How people usually eat it'),
-                      _bulletList(card.howPeopleUsuallyEatIt),
+                    if (card.howPeopleUsuallyEatIt
+                        .isNotEmpty) ...[
+                      _sectionLabel(
+                        'How people usually eat it',
+                      ),
+
+                      _bulletList(
+                        card
+                            .howPeopleUsuallyEatIt,
+                      ),
                     ],
 
-                    if (card.pairings.isNotEmpty) ...[
+                    if (card.pairings
+                        .isNotEmpty) ...[
                       _sectionLabel('Pairings'),
-                      _bulletList(card.pairings),
+
+                      _bulletList(
+                        card.pairings,
+                      ),
                     ],
 
-                    if (card.firstImpressions.isNotEmpty) ...[
-                      _sectionLabel('First impressions', top: 28),
-                      _bulletList(card.firstImpressions),
+                    if (card.firstImpressions
+                        .isNotEmpty) ...[
+                      _sectionLabel(
+                        'First impressions',
+                        top: 28,
+                      ),
+
+                      _bulletList(
+                        card.firstImpressions,
+                      ),
                     ],
 
-                    if (card.ripeness.isNotEmpty) ...[
+                    if (card.ripeness
+                        .isNotEmpty) ...[
                       _sectionLabel('Ripeness'),
-                      _bulletList(card.ripeness),
+
+                      _bulletList(
+                        card.ripeness,
+                      ),
                     ],
 
-                    if (card.storageAndServing.isNotEmpty) ...[
-                      _sectionLabel('Storage & serving'),
-                      _bulletList(card.storageAndServing),
+                    if (card.storageAndServing
+                        .isNotEmpty) ...[
+                      _sectionLabel(
+                        'Storage & serving',
+                      ),
+
+                      _bulletList(
+                        card.storageAndServing,
+                      ),
                     ],
 
-                    if (card.goodToKnow.isNotEmpty) ...[
-                      _sectionLabel('Good to know'),
-                      _bulletList(card.goodToKnow),
+                    if (card.goodToKnow
+                        .isNotEmpty) ...[
+                      _sectionLabel(
+                        'Good to know',
+                      ),
+
+                      _bulletList(
+                        card.goodToKnow,
+                      ),
                     ],
 
-                    if (card.production.isNotEmpty) ...[
-                      _sectionLabel('Production'),
+                    if (card.production
+                        .isNotEmpty) ...[
+                      _sectionLabel(
+                        'Production',
+                      ),
+
                       Text(card.production),
                     ],
                   ],
@@ -309,7 +420,8 @@ class _FeaturedFoodDetailScreenState
         ),
 
         BackButtonCommon(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () =>
+              Navigator.pop(context),
           topOffset: topInset + 12,
         ),
 
@@ -318,7 +430,8 @@ class _FeaturedFoodDetailScreenState
           right: 12,
           child: CircleIconButton(
             icon: Icons.search,
-            onPressed: () => _openNavigatorMenu(context),
+            onPressed: () =>
+                _openNavigatorMenu(context),
           ),
         ),
       ],
@@ -332,7 +445,10 @@ class _FeaturedFoodDetailScreenState
         controller: _controller,
         itemCount: widget.cards.length,
         itemBuilder: (context, index) {
-          return _buildPage(context, index);
+          return _buildPage(
+            context,
+            index,
+          );
         },
       ),
     );
