@@ -199,8 +199,16 @@ class _FeaturedFoodDetailScreenState
     final shortDesc =
         card.infoShortDescription.trim();
 
-    // 👉 TEMP
-    final strength = '3';
+final strengthMap = {
+  'very mild': '1',
+  'mild': '2',
+  'medium': '3',
+  'strong': '4',
+  'very strong': '5',
+};
+
+final strength =
+    strengthMap[card.strength.toLowerCase()] ?? '?';
 
     // 👉 TEMP
     final milkType = 'Cow';
