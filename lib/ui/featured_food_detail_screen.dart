@@ -6,6 +6,7 @@ import '../config/flavour.dart';
 import 'widgets/back_button_common.dart';
 import 'widgets/circle_icon_button.dart';
 import 'widgets/strength_guide_sheet.dart';
+import 'widgets/region_map_sheet.dart';
 import 'widgets/cheese_meta_row.dart';
 import 'navigator_menu_screen.dart';
 
@@ -37,6 +38,7 @@ class _FeaturedFoodDetailScreenState
   @override
   void initState() {
     super.initState();
+
     _controller = PageController(
       initialPage: widget.index,
     );
@@ -398,7 +400,13 @@ class _FeaturedFoodDetailScreenState
                       strength:
                           strength,
 
-                      onMapTap: () {},
+                      onMapTap: () {
+                        showRegionMapSheet(
+                          context,
+                          mapAsset:
+                              'assets/shared/maps/france_region_southwest.png',
+                        );
+                      },
 
                       onStrengthTap:
                           () {

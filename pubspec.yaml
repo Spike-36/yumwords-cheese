@@ -30,6 +30,7 @@ flutter:
     # Shared (global)
     - assets/shared/images/ui/
     - assets/shared/flags/
+    - assets/shared/maps/
 
     # France
     # - assets/france/images/ui/
