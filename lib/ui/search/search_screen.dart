@@ -142,7 +142,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return results;
   }
 
-  // ------------------------------------------------------------
+    // ------------------------------------------------------------
   // CHIP GROUP
   // ------------------------------------------------------------
   Widget buildChipGroup({
@@ -176,21 +176,29 @@ class _SearchScreenState extends State<SearchScreen> {
               final value =
                   option.toLowerCase();
 
-              final selected =
-                  selectedSet.contains(value);
-
               return FilterChip(
+                key: ValueKey(
+                  '$title-$value-${selectedSet.contains(value)}',
+                ),
+
                 label: Text(option),
-                selected: selected,
-                onSelected: (_) {
+
+                // 👉 ALWAYS READ LIVE STATE
+                selected:
+                    selectedSet.contains(value),
+
+                onSelected: (isSelected) {
+
+                  // 👉 UPDATE REAL STATE
                   setState(() {
-                    if (selected) {
-                      selectedSet.remove(value);
-                    } else {
+                    if (isSelected) {
                       selectedSet.add(value);
+                    } else {
+                      selectedSet.remove(value);
                     }
                   });
 
+                  // 👉 FORCE MODAL REBUILD
                   refreshModal();
                 },
               );
@@ -206,6 +214,7 @@ class _SearchScreenState extends State<SearchScreen> {
   // ------------------------------------------------------------
   void _showFilters() {
     showModalBottomSheet(
+  useRootNavigator: true,
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.white,
@@ -216,6 +225,9 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       builder: (context) {
         return StatefulBuilder(
+  key: ValueKey(
+    '${selectedTypes.join()}-${selectedMilk.join()}-${selectedStrength.join()}-$selectedRegion',
+  ),
           builder:
               (context, modalSetState) {
             return SafeArea(
