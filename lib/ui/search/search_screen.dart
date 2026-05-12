@@ -28,7 +28,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Set<String> selectedTypes = {};
   Set<String> selectedMilk = {};
   Set<String> selectedStrength = {};
-  String? selectedRegion;
+  Set<String> selectedRegions = {};
 
   // ------------------------------------------------------------
   // OPTIONS
@@ -55,14 +55,14 @@ class _SearchScreenState extends State<SearchScreen> {
   ];
 
   final List<String> regionOptions = [
-    'normandy',
-    'alps',
-    'auvergne',
-    'southwest',
-    'brittany',
-    'burgundy',
-    'central north',
-    'paris brie',
+    'Normandy & Channel Coast',
+    'Paris Basin & Northern Heartland',
+    'Burgundy, Jura & Eastern France',
+    'Alps & Savoie',
+    'Auvergne & Central Mountains',
+    'Loire Valley & Western France',
+    'Southwest & Pyrenees',
+    'Mediterranean South & Corsica',
   ];
 
   // ------------------------------------------------------------
@@ -87,6 +87,14 @@ class _SearchScreenState extends State<SearchScreen> {
 
       return selected.contains(
         value.toLowerCase(),
+      );
+    }
+
+    bool matchesRegion(Flashcard card) {
+      if (selectedRegions.isEmpty) return true;
+
+      return selectedRegions.contains(
+        card.region,
       );
     }
 
@@ -126,9 +134,7 @@ class _SearchScreenState extends State<SearchScreen> {
             card.strength,
             selectedStrength,
           ) &&
-          (selectedRegion == null ||
-              card.region.toLowerCase() ==
-                  selectedRegion);
+          matchesRegion(card);
     }).toList();
 
     results.sort(
@@ -142,7 +148,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return results;
   }
 
-    // ------------------------------------------------------------
+  // ------------------------------------------------------------
   // CHIP GROUP
   // ------------------------------------------------------------
   Widget buildChipGroup({
@@ -178,27 +184,23 @@ class _SearchScreenState extends State<SearchScreen> {
 
               return FilterChip(
                 key: ValueKey(
-                  '$title-$value-${selectedSet.contains(value)}',
+                  '$title-$option-${selectedSet.contains(option)}',
                 ),
 
                 label: Text(option),
 
-                // 👉 ALWAYS READ LIVE STATE
                 selected:
-                    selectedSet.contains(value),
+                    selectedSet.contains(option),
 
                 onSelected: (isSelected) {
-
-                  // 👉 UPDATE REAL STATE
                   setState(() {
                     if (isSelected) {
-                      selectedSet.add(value);
+                      selectedSet.add(option);
                     } else {
-                      selectedSet.remove(value);
+                      selectedSet.remove(option);
                     }
                   });
 
-                  // 👉 FORCE MODAL REBUILD
                   refreshModal();
                 },
               );
@@ -214,7 +216,7 @@ class _SearchScreenState extends State<SearchScreen> {
   // ------------------------------------------------------------
   void _showFilters() {
     showModalBottomSheet(
-  useRootNavigator: true,
+      useRootNavigator: true,
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.white,
@@ -225,9 +227,9 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       builder: (context) {
         return StatefulBuilder(
-  key: ValueKey(
-    '${selectedTypes.join()}-${selectedMilk.join()}-${selectedStrength.join()}-$selectedRegion',
-  ),
+          key: ValueKey(
+            '${selectedTypes.join()}-${selectedMilk.join()}-${selectedStrength.join()}-${selectedRegions.join()}',
+          ),
           builder:
               (context, modalSetState) {
             return SafeArea(
@@ -245,7 +247,6 @@ class _SearchScreenState extends State<SearchScreen> {
                         CrossAxisAlignment
                             .start,
                     children: [
-                      // HANDLE
                       Center(
                         child: Container(
                           width: 40,
@@ -322,45 +323,16 @@ class _SearchScreenState extends State<SearchScreen> {
                         },
                       ),
 
-                      Padding(
-                        padding:
-                            const EdgeInsets
-                                .symmetric(
-                          horizontal: 16,
-                        ),
-                        child:
-                            DropdownButton<String>(
-                          isExpanded: true,
-                          hint: const Text(
-                            'Select region',
-                          ),
-                          value:
-                              selectedRegion,
-                          items:
-                              regionOptions
-                                  .map(
-                            (region) {
-                              return DropdownMenuItem(
-                                value:
-                                    region,
-                                child:
-                                    Text(
-                                  region,
-                                ),
-                              );
-                            },
-                          ).toList(),
-                          onChanged:
-                              (value) {
-                            setState(() {
-                              selectedRegion =
-                                  value;
-                            });
-
-                            modalSetState(
-                                () {});
-                          },
-                        ),
+                      buildChipGroup(
+                        title: 'Region',
+                        options:
+                            regionOptions,
+                        selectedSet:
+                            selectedRegions,
+                        refreshModal: () {
+                          modalSetState(
+                              () {});
+                        },
                       ),
 
                       const SizedBox(
@@ -410,7 +382,6 @@ class _SearchScreenState extends State<SearchScreen> {
         bottom: false,
         child: Column(
           children: [
-            // HEADER
             Padding(
               padding:
                   const EdgeInsets.only(
@@ -435,7 +406,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
             const SizedBox(height: 8),
 
-            // SEARCH
             Padding(
               padding:
                   const EdgeInsets.fromLTRB(
@@ -492,7 +462,6 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
 
-            // FILTER BUTTON
             Padding(
               padding:
                   const EdgeInsets.symmetric(
@@ -516,7 +485,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
             const SizedBox(height: 6),
 
-            // RESULTS
             Expanded(
               child: _buildResults(),
             ),
@@ -569,7 +537,6 @@ class _SearchScreenState extends State<SearchScreen> {
             crossAxisAlignment:
                 CrossAxisAlignment.start,
             children: [
-              // IMAGE
               Expanded(
                 child: ClipRRect(
                   borderRadius:
@@ -606,7 +573,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
               const SizedBox(height: 6),
 
-              // NAME
               Text(
                 card.headword,
                 maxLines: 2,
