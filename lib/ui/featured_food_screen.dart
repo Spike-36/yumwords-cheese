@@ -5,7 +5,9 @@ import '../services/audio_service.dart';
 import '../config/flavour.dart';
 import '../data/featured/featured_registry.dart';
 import 'featured_food_detail_screen.dart';
-import 'navigator_menu_screen.dart';
+
+// 👉 CHANGED
+import 'search/search_screen.dart';
 
 // ------------------------------------------------------------
 // 🔒 LOCKED layout rules (do not auto-adjust)
@@ -60,15 +62,14 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
     );
   }
 
+  // 👉 CHANGED: DIRECT SEARCH SCREEN
   void _openNavigatorMenu(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => NavigatorMenuScreen(
+        builder: (_) => SearchScreen(
           cards: widget.cards,
           audio: widget.audio,
-          languageCode: widget.languageCode,
-          autoAudio: widget.autoAudio,
         ),
       ),
     );
@@ -84,8 +85,8 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
       context,
       MaterialPageRoute(
         builder: (_) => FeaturedFoodDetailScreen(
-          index: index, // 👉 correct
-          cards: list, // 👉 correct dataset
+          index: index,
+          cards: list,
           audio: widget.audio,
           languageCode: widget.languageCode,
           autoAudio: widget.autoAudio,
@@ -131,8 +132,8 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
                   ),
 
                   Positioned(
-                    right: -10, // 👉 preserved
-                    top: -3, // 👉 preserved
+                    right: -10,
+                    top: -3,
                     child: IconButton(
                       icon: const Icon(
                         Icons.search,
@@ -149,7 +150,7 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
 
             // 👉 segmented controls row
             Transform.translate(
-              offset: const Offset(18, 8), // 👉 adjusted
+              offset: const Offset(18, 8),
               child: SizedBox(
                 width: 260,
                 child: ToggleButtons(

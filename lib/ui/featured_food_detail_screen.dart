@@ -445,8 +445,14 @@ class _FeaturedFoodDetailScreenState
                       ),
 
                       Text(
-                        card.production,
-                      ),
+  card.production,
+  style: const TextStyle(
+    fontFamily: 'SourceSans3',
+    fontSize: 15,
+    height: 1.45,
+    color: Colors.black87,
+  ),
+),
                     ],
                   ],
                 ),
