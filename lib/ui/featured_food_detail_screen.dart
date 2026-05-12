@@ -434,7 +434,7 @@ class _FeaturedFoodDetailScreenState
                           style: TextStyle(
                             fontFamily:
                                 'SourceSans3',
-                            fontSize: 12,
+                            fontSize: 15,
                             fontWeight:
                                 FontWeight
                                     .w600,

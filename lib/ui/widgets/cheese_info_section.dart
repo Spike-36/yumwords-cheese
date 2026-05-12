@@ -30,11 +30,11 @@ class CheeseInfoSection extends StatelessWidget {
           child: Text(
             title,
             style: const TextStyle(
-              fontFamily: 'SourceSans3',
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
+  fontFamily: 'SourceSans3',
+  fontSize: 15,
+  fontWeight: FontWeight.w600,
+  color: Colors.black87,
+),
           ),
         ),
 
