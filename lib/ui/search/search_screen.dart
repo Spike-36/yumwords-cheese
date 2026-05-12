@@ -157,105 +157,131 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  // ------------------------------------------------------------
-  // BUILD
-  // ------------------------------------------------------------
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        top: true,
-        bottom: false,
-        child: Column(
-          children: [
-            // TOP FILTER AREA
-            SizedBox(
-              height: 420,
-              child: ListView(
+// ------------------------------------------------------------
+// BUILD
+// ------------------------------------------------------------
+
+@override
+Widget build(BuildContext context) {
+
+
+  return Scaffold(
+    backgroundColor: Colors.white,
+    body: SafeArea(
+      top: true,
+      bottom: false,
+      child: Column(
+        children: [
+          // ------------------------------------------------------------
+          // HEADER + SEARCH
+          // ------------------------------------------------------------
+          Padding(
+            padding: const EdgeInsets.only(left: 4, top: 8),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, size: 26),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 12,
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF2F2F2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 4, top: 8),
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, size: 26),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF2F2F2),
-                        borderRadius: BorderRadius.circular(12),
+                  const Icon(Icons.search, size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      decoration: const InputDecoration(
+                        hintText: 'Search',
+                        border: InputBorder.none,
                       ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.search, size: 20),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: TextField(
-                              controller: _controller,
-                              decoration: const InputDecoration(
-                                hintText: 'Search',
-                                border: InputBorder.none,
-                              ),
-                              onChanged: (value) {
-                                setState(() {
-                                  query = value;
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Text(
-                      'Browse by category',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  buildChipGroup('Type', typeOptions, selectedTypes),
-                  buildChipGroup('Milk', milkOptions, selectedMilk),
-                  buildChipGroup(
-                      'Strength', strengthOptions, selectedStrength),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: DropdownButton<String>(
-                      isExpanded: true,
-                      hint: const Text('Select country'),
-                      value: selectedCountry,
-                      items: countryOptions.map((country) {
-                        return DropdownMenuItem(
-                          value: country,
-                          child: Text(country),
-                        );
-                      }).toList(),
                       onChanged: (value) {
                         setState(() {
-                          selectedCountry = value;
+                          query = value;
                         });
                       },
                     ),
                   ),
-                  const SizedBox(height: 8),
                 ],
               ),
             ),
+          ),
 
-            // RESULTS GRID
-            Expanded(child: _buildResults()),
-          ],
-        ),
+          // ------------------------------------------------------------
+          // FILTER ACCORDION
+          // ------------------------------------------------------------
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: ExpansionTile(
+              initiallyExpanded: false,
+              tilePadding: const EdgeInsets.symmetric(horizontal: 4),
+              childrenPadding: EdgeInsets.zero,
+              title: const Text(
+                'Browse by category',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              children: [
+                buildChipGroup('Type', typeOptions, selectedTypes),
+                buildChipGroup('Milk', milkOptions, selectedMilk),
+                buildChipGroup(
+                  'Strength',
+                  strengthOptions,
+                  selectedStrength,
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: DropdownButton<String>(
+                    isExpanded: true,
+                    hint: const Text('Select country'),
+                    value: selectedCountry,
+                    items: countryOptions.map((country) {
+                      return DropdownMenuItem(
+                        value: country,
+                        child: Text(country),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedCountry = value;
+                      });
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+
+          // ------------------------------------------------------------
+          // RESULTS GRID
+          // ------------------------------------------------------------
+          Expanded(
+            child: _buildResults(),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   // ------------------------------------------------------------
   // GRID RESULTS
