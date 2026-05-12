@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../data/card.dart';
-import '../featured_food_detail_screen.dart'; // 🔄 CHANGED
+import '../featured_food_detail_screen.dart';
 import '../../services/audio_service.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -28,7 +28,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Set<String> selectedTypes = {};
   Set<String> selectedMilk = {};
   Set<String> selectedStrength = {};
-  String? selectedCountry;
+  String? selectedRegion;
 
   // ------------------------------------------------------------
   // OPTIONS
@@ -54,11 +54,15 @@ class _SearchScreenState extends State<SearchScreen> {
     'very strong',
   ];
 
-  final List<String> countryOptions = [
-    'france',
-    'italy',
-    'spain',
-    'uk',
+  final List<String> regionOptions = [
+    'normandy',
+    'alps',
+    'auvergne',
+    'southwest',
+    'brittany',
+    'burgundy',
+    'central north',
+    'paris brie',
   ];
 
   // ------------------------------------------------------------
@@ -75,67 +79,105 @@ class _SearchScreenState extends State<SearchScreen> {
           card.infoShortDescription.toLowerCase().contains(q);
     }
 
-    bool matchesFilter(String value, Set<String> selected) {
+    bool matchesFilter(
+      String value,
+      Set<String> selected,
+    ) {
       if (selected.isEmpty) return true;
-      return selected.contains(value.toLowerCase());
+
+      return selected.contains(
+        value.toLowerCase(),
+      );
     }
 
     bool matchesTypes(Flashcard card) {
       if (selectedTypes.isEmpty) return true;
 
-      final cardTypes = card.types.map((e) => e.toLowerCase()).toList();
+      final cardTypes = card.types
+          .map((e) => e.toLowerCase())
+          .toList();
+
       final expandedTypes = [...cardTypes];
 
       if (cardTypes.contains('fresh')) {
         expandedTypes.add('soft');
       }
 
-      if (cardTypes.contains('semi-soft / semi-hard')) {
+      if (cardTypes.contains(
+          'semi-soft / semi-hard')) {
         expandedTypes.add('semi-soft');
         expandedTypes.add('semi-hard');
       }
 
       return selectedTypes.any(
-        (selected) => expandedTypes.contains(selected),
+        (selected) =>
+            expandedTypes.contains(selected),
       );
     }
 
     final results = widget.cards.where((card) {
       return matchesText(card) &&
           matchesTypes(card) &&
-          matchesFilter(card.milk, selectedMilk) &&
-          matchesFilter(card.strength, selectedStrength) &&
-          (selectedCountry == null ||
-              card.country.toLowerCase() == selectedCountry);
+          matchesFilter(
+            card.milk,
+            selectedMilk,
+          ) &&
+          matchesFilter(
+            card.strength,
+            selectedStrength,
+          ) &&
+          (selectedRegion == null ||
+              card.region.toLowerCase() ==
+                  selectedRegion);
     }).toList();
 
-    // 👉 SORT ALPHABETICALLY
-    results.sort((a, b) =>
-        a.headword.toLowerCase().compareTo(b.headword.toLowerCase()));
+    results.sort(
+      (a, b) => a.headword
+          .toLowerCase()
+          .compareTo(
+            b.headword.toLowerCase(),
+          ),
+    );
 
     return results;
   }
 
   // ------------------------------------------------------------
-  // CHIP BUILDER
+  // CHIP GROUP
   // ------------------------------------------------------------
-  Widget buildChipGroup(
-    String title,
-    List<String> options,
-    Set<String> selectedSet,
-  ) {
+  Widget buildChipGroup({
+    required String title,
+    required List<String> options,
+    required Set<String> selectedSet,
+    required VoidCallback refreshModal,
+  }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 6,
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
           Wrap(
             spacing: 8,
+            runSpacing: 8,
             children: options.map((option) {
-              final value = option.toLowerCase();
-              final selected = selectedSet.contains(value);
+              final value =
+                  option.toLowerCase();
+
+              final selected =
+                  selectedSet.contains(value);
 
               return FilterChip(
                 label: Text(option),
@@ -148,6 +190,8 @@ class _SearchScreenState extends State<SearchScreen> {
                       selectedSet.add(value);
                     }
                   });
+
+                  refreshModal();
                 },
               );
             }).toList(),
@@ -157,143 +201,333 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-// ------------------------------------------------------------
-// BUILD
-// ------------------------------------------------------------
-
-@override
-Widget build(BuildContext context) {
-
-
-  return Scaffold(
-    backgroundColor: Colors.white,
-    body: SafeArea(
-      top: true,
-      bottom: false,
-      child: Column(
-        children: [
-          // ------------------------------------------------------------
-          // HEADER + SEARCH
-          // ------------------------------------------------------------
-          Padding(
-            padding: const EdgeInsets.only(left: 4, top: 8),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back, size: 26),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 12,
-              ),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF2F2F2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.search, size: 20),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      decoration: const InputDecoration(
-                        hintText: 'Search',
-                        border: InputBorder.none,
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          query = value;
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // ------------------------------------------------------------
-          // FILTER ACCORDION
-          // ------------------------------------------------------------
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: ExpansionTile(
-              initiallyExpanded: false,
-              tilePadding: const EdgeInsets.symmetric(horizontal: 4),
-              childrenPadding: EdgeInsets.zero,
-              title: const Text(
-                'Browse by category',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              children: [
-                buildChipGroup('Type', typeOptions, selectedTypes),
-                buildChipGroup('Milk', milkOptions, selectedMilk),
-                buildChipGroup(
-                  'Strength',
-                  strengthOptions,
-                  selectedStrength,
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    hint: const Text('Select country'),
-                    value: selectedCountry,
-                    items: countryOptions.map((country) {
-                      return DropdownMenuItem(
-                        value: country,
-                        child: Text(country),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedCountry = value;
-                      });
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-              ],
-            ),
-          ),
-
-          // ------------------------------------------------------------
-          // RESULTS GRID
-          // ------------------------------------------------------------
-          Expanded(
-            child: _buildResults(),
-          ),
-        ],
+  // ------------------------------------------------------------
+  // FILTER MODAL
+  // ------------------------------------------------------------
+  void _showFilters() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
       ),
-    ),
-  );
-}
+      builder: (context) {
+        return StatefulBuilder(
+          builder:
+              (context, modalSetState) {
+            return SafeArea(
+              child: Padding(
+                padding:
+                    const EdgeInsets.only(
+                  left: 8,
+                  right: 8,
+                  top: 12,
+                  bottom: 24,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment
+                            .start,
+                    children: [
+                      // HANDLE
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 5,
+                          decoration:
+                              BoxDecoration(
+                            color: Colors
+                                .grey
+                                .shade400,
+                            borderRadius:
+                                BorderRadius
+                                    .circular(
+                              20,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(
+                          height: 20),
+
+                      const Padding(
+                        padding:
+                            EdgeInsets.symmetric(
+                          horizontal: 16,
+                        ),
+                        child: Text(
+                          'Filters',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight:
+                                FontWeight
+                                    .bold,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(
+                          height: 12),
+
+                      buildChipGroup(
+                        title: 'Type',
+                        options:
+                            typeOptions,
+                        selectedSet:
+                            selectedTypes,
+                        refreshModal: () {
+                          modalSetState(
+                              () {});
+                        },
+                      ),
+
+                      buildChipGroup(
+                        title: 'Milk',
+                        options:
+                            milkOptions,
+                        selectedSet:
+                            selectedMilk,
+                        refreshModal: () {
+                          modalSetState(
+                              () {});
+                        },
+                      ),
+
+                      buildChipGroup(
+                        title: 'Strength',
+                        options:
+                            strengthOptions,
+                        selectedSet:
+                            selectedStrength,
+                        refreshModal: () {
+                          modalSetState(
+                              () {});
+                        },
+                      ),
+
+                      Padding(
+                        padding:
+                            const EdgeInsets
+                                .symmetric(
+                          horizontal: 16,
+                        ),
+                        child:
+                            DropdownButton<String>(
+                          isExpanded: true,
+                          hint: const Text(
+                            'Select region',
+                          ),
+                          value:
+                              selectedRegion,
+                          items:
+                              regionOptions
+                                  .map(
+                            (region) {
+                              return DropdownMenuItem(
+                                value:
+                                    region,
+                                child:
+                                    Text(
+                                  region,
+                                ),
+                              );
+                            },
+                          ).toList(),
+                          onChanged:
+                              (value) {
+                            setState(() {
+                              selectedRegion =
+                                  value;
+                            });
+
+                            modalSetState(
+                                () {});
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(
+                          height: 24),
+
+                      Padding(
+                        padding:
+                            const EdgeInsets
+                                .symmetric(
+                          horizontal: 16,
+                        ),
+                        child: SizedBox(
+                          width:
+                              double.infinity,
+                          child:
+                              ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(
+                                  context);
+                            },
+                            child: const Text(
+                              'Done',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   // ------------------------------------------------------------
-  // GRID RESULTS
+  // BUILD
+  // ------------------------------------------------------------
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        top: true,
+        bottom: false,
+        child: Column(
+          children: [
+            // HEADER
+            Padding(
+              padding:
+                  const EdgeInsets.only(
+                left: 4,
+                top: 8,
+              ),
+              child: Align(
+                alignment:
+                    Alignment.centerLeft,
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    size: 26,
+                  ),
+                  onPressed: () =>
+                      Navigator.pop(
+                    context,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            // SEARCH
+            Padding(
+              padding:
+                  const EdgeInsets.fromLTRB(
+                16,
+                8,
+                16,
+                8,
+              ),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color:
+                      const Color(0xFFF2F2F2),
+                  borderRadius:
+                      BorderRadius.circular(
+                    12,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.search,
+                      size: 20,
+                    ),
+
+                    const SizedBox(
+                        width: 10),
+
+                    Expanded(
+                      child: TextField(
+                        controller:
+                            _controller,
+                        decoration:
+                            const InputDecoration(
+                          hintText:
+                              'Search cheeses',
+                          border:
+                              InputBorder.none,
+                        ),
+                        onChanged:
+                            (value) {
+                          setState(() {
+                            query = value;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // FILTER BUTTON
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(
+                horizontal: 16,
+              ),
+              child: Align(
+                alignment:
+                    Alignment.centerLeft,
+                child:
+                    OutlinedButton.icon(
+                  onPressed:
+                      _showFilters,
+                  icon: const Icon(
+                    Icons.tune,
+                  ),
+                  label:
+                      const Text('Filters'),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            // RESULTS
+            Expanded(
+              child: _buildResults(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ------------------------------------------------------------
+  // RESULTS GRID
   // ------------------------------------------------------------
   Widget _buildResults() {
     if (filteredResults.isEmpty) {
-      return const Center(child: Text('No results'));
+      return const Center(
+        child: Text('No results'),
+      );
     }
 
     return GridView.builder(
       padding: const EdgeInsets.all(12),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate:
+          const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
@@ -301,37 +535,56 @@ Widget build(BuildContext context) {
       ),
       itemCount: filteredResults.length,
       itemBuilder: (context, index) {
-        final card = filteredResults[index];
+        final card =
+            filteredResults[index];
 
         return GestureDetector(
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => FeaturedFoodDetailScreen(
-                  cards: filteredResults, // 👉 FIXED
-                  index: index,           // 👉 FIXED
+                builder: (_) =>
+                    FeaturedFoodDetailScreen(
+                  cards:
+                      filteredResults,
+                  index: index,
                   audio: widget.audio,
                 ),
               ),
             );
           },
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
             children: [
               // IMAGE
               Expanded(
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius:
+                      BorderRadius.circular(
+                    12,
+                  ),
                   child: Image.asset(
                     'assets/cheese/images/words/${card.image}',
-                    width: double.infinity,
+                    width:
+                        double.infinity,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
+                    errorBuilder:
+                        (
+                      context,
+                      error,
+                      stackTrace,
+                    ) {
                       return Container(
-                        color: Colors.grey.shade200,
-                        child: const Center(
-                          child: Icon(Icons.image_not_supported),
+                        color: Colors
+                            .grey
+                            .shade200,
+                        child:
+                            const Center(
+                          child: Icon(
+                            Icons
+                                .image_not_supported,
+                          ),
                         ),
                       );
                     },
@@ -345,9 +598,11 @@ Widget build(BuildContext context) {
               Text(
                 card.headword,
                 maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+                overflow:
+                    TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontWeight: FontWeight.w600,
+                  fontWeight:
+                      FontWeight.w600,
                   fontSize: 14,
                 ),
               ),

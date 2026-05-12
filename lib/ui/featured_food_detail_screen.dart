@@ -9,7 +9,9 @@ import 'widgets/strength_guide_sheet.dart';
 import 'widgets/region_map_sheet.dart';
 import 'widgets/cheese_meta_row.dart';
 import 'widgets/cheese_info_section.dart';
-import 'navigator_menu_screen.dart';
+
+// 👉 CHANGED
+import 'search/search_screen.dart';
 
 class FeaturedFoodDetailScreen extends StatefulWidget {
   final int index;
@@ -127,18 +129,16 @@ class _FeaturedFoodDetailScreenState
     }
   }
 
-  void _openNavigatorMenu(
+  // 👉 CHANGED
+  void _openSearchScreen(
     BuildContext context,
   ) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => NavigatorMenuScreen(
+        builder: (_) => SearchScreen(
           cards: widget.cards,
           audio: widget.audio,
-          languageCode:
-              widget.languageCode,
-          autoAudio: widget.autoAudio,
         ),
       ),
     );
@@ -445,14 +445,14 @@ class _FeaturedFoodDetailScreenState
                       ),
 
                       Text(
-  card.production,
-  style: const TextStyle(
-    fontFamily: 'SourceSans3',
-    fontSize: 15,
-    height: 1.45,
-    color: Colors.black87,
-  ),
-),
+                        card.production,
+                        style: const TextStyle(
+                          fontFamily: 'SourceSans3',
+                          fontSize: 15,
+                          height: 1.45,
+                          color: Colors.black87,
+                        ),
+                      ),
                     ],
                   ],
                 ),
@@ -473,8 +473,10 @@ class _FeaturedFoodDetailScreenState
           right: 12,
           child: CircleIconButton(
             icon: Icons.search,
+
+            // 👉 CHANGED
             onPressed: () =>
-                _openNavigatorMenu(
+                _openSearchScreen(
               context,
             ),
           ),
