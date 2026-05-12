@@ -8,6 +8,7 @@ import 'widgets/circle_icon_button.dart';
 import 'widgets/strength_guide_sheet.dart';
 import 'widgets/region_map_sheet.dart';
 import 'widgets/cheese_meta_row.dart';
+import 'widgets/cheese_info_section.dart';
 import 'navigator_menu_screen.dart';
 
 class FeaturedFoodDetailScreen extends StatefulWidget {
@@ -44,77 +45,6 @@ class _FeaturedFoodDetailScreenState
     );
   }
 
-  String _flagPath(String country) {
-    switch (country.toLowerCase().trim()) {
-      case 'france':
-        return 'assets/shared/flags/france.png';
-
-      case 'italy':
-        return 'assets/shared/flags/italy.png';
-
-      case 'spain':
-        return 'assets/shared/flags/spain.png';
-
-      case 'uk':
-      case 'united kingdom':
-        return 'assets/shared/flags/uk.png';
-
-      case 'ireland':
-        return 'assets/shared/flags/ireland.png';
-
-      case 'switzerland':
-        return 'assets/shared/flags/switzerland.png';
-
-      case 'netherlands':
-        return 'assets/shared/flags/netherlands.png';
-
-      case 'belgium':
-        return 'assets/shared/flags/belgium.png';
-
-      case 'germany':
-        return 'assets/shared/flags/germany.png';
-
-      case 'austria':
-        return 'assets/shared/flags/austria.png';
-
-      case 'portugal':
-        return 'assets/shared/flags/portugal.png';
-
-      case 'greece':
-        return 'assets/shared/flags/greece.png';
-
-      case 'denmark':
-        return 'assets/shared/flags/denmark.png';
-
-      case 'norway':
-        return 'assets/shared/flags/norway.png';
-
-      case 'sweden':
-        return 'assets/shared/flags/sweden.png';
-
-      case 'finland':
-        return 'assets/shared/flags/finland.png';
-
-      case 'romania':
-        return 'assets/shared/flags/romania.png';
-
-      case 'turkey':
-        return 'assets/shared/flags/turkey.png';
-
-      case 'bulgaria':
-        return 'assets/shared/flags/bulgaria.png';
-
-      case 'slovakia':
-        return 'assets/shared/flags/slovakia.png';
-
-      case 'poland':
-        return 'assets/shared/flags/poland.png';
-
-      default:
-        return '';
-    }
-  }
-
   String _audioPath(String? filename) {
     final f = (filename ?? '').trim();
 
@@ -129,6 +59,50 @@ class _FeaturedFoodDetailScreenState
     return f.isEmpty
         ? ''
         : imageCountryPath(f);
+  }
+
+  // 👉 FIXED REGION MAP LOOKUP
+  String _regionMapPath(String region) {
+    switch (
+        region
+            .toLowerCase()
+            .trim()) {
+
+      // 🔄 UPDATED TO MATCH DATABASE / JSON REGION NAMES EXACTLY
+
+      case 'paris basin & northern heartland':
+        return 'assets/shared/maps/france_region_paris_central_north.png';
+
+      case 'normandy & channel coast':
+        return 'assets/shared/maps/france_region_normandy_channel_coast.png';
+
+      case 'loire valley & western france':
+        return 'assets/shared/maps/france_region_loire_valley_western_france.png';
+
+      case 'southwest & pyrenees':
+        return 'assets/shared/maps/france_region_southwest_pyrenees.png';
+
+      case 'auvergne & central mountains':
+        return 'assets/shared/maps/france_region_auvergne_central_mountains.png';
+
+      case 'burgundy, jura & eastern france':
+        return 'assets/shared/maps/france_region_burgundy_jura_eastern_france.png';
+
+      case 'alps & savoie':
+        return 'assets/shared/maps/france_region_alps_savoie.png';
+
+      case 'mediterranean south & corsica':
+        return 'assets/shared/maps/france_region_mediterranean_south_corsica.png';
+
+      default:
+
+        // 👉 DEBUG OUTPUT FOR UNKNOWN REGION STRINGS
+        debugPrint(
+          '⚠️ Unknown region: $region',
+        );
+
+        return 'assets/shared/maps/france_region_paris_basin_northern_heartland.png';
+    }
   }
 
   Future<void> _safePlay(
@@ -167,63 +141,6 @@ class _FeaturedFoodDetailScreenState
           autoAudio: widget.autoAudio,
         ),
       ),
-    );
-  }
-
-  Widget _sectionLabel(
-    String text, {
-    double top = 20,
-  }) {
-    return Padding(
-      padding: EdgeInsets.only(
-        top: top,
-        bottom: 4,
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontFamily: 'SourceSans3',
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
-        ),
-      ),
-    );
-  }
-
-  Widget _bulletList(
-    List<String> items,
-  ) {
-    return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
-      children: items.map((item) {
-        return Padding(
-          padding: const EdgeInsets.only(
-            bottom: 6,
-          ),
-          child: Row(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
-            children: [
-              const Text('•  '),
-
-              Expanded(
-                child: Text(
-                  item,
-                  style: const TextStyle(
-                    fontFamily:
-                        'SourceSans3',
-                    fontSize: 15,
-                    height: 1.45,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
     );
   }
 
@@ -349,10 +266,20 @@ class _FeaturedFoodDetailScreenState
                                         .center,
                               ),
                             ),
-
+                            const Positioned(
+                              left: 0,
+                              top: 10,
+                              child: Opacity(
+                                opacity: 0,
+                                child: Icon(
+                                  Icons.volume_up,
+                                  size: 28,
+                                ),
+                              ),
+                            ),
                             const Positioned(
                               right: 0,
-                              top: 6,
+                              top: 10,
                               child: Icon(
                                 Icons
                                     .volume_up,
@@ -379,7 +306,7 @@ class _FeaturedFoodDetailScreenState
                               const TextStyle(
                             fontFamily:
                                 'CharisSIL',
-                            fontSize: 16,
+                            fontSize: 14,
                             fontStyle:
                                 FontStyle
                                     .italic,
@@ -404,7 +331,11 @@ class _FeaturedFoodDetailScreenState
                         showRegionMapSheet(
                           context,
                           mapAsset:
-                              'assets/shared/maps/france_region_southwest.png',
+                              _regionMapPath(
+                            card.region,
+                          ),
+                          regionName:
+                              card.region,
                         );
                       },
 
@@ -434,116 +365,83 @@ class _FeaturedFoodDetailScreenState
                         ),
                       ),
 
-                    if (card
-                        .whereYouWillSeeIt
-                        .isNotEmpty) ...[
-                      _sectionLabel(
-                        'Where you’ll see it',
-                        top: 36,
-                      ),
+                    CheeseInfoSection(
+                      title:
+                          'Where you’ll see it',
+                      items:
+                          card.whereYouWillSeeIt,
+                      topSpacing: 36,
+                    ),
 
-                      _bulletList(
-                        card
-                            .whereYouWillSeeIt,
-                      ),
-                    ],
+                    CheeseInfoSection(
+                      title:
+                          'Regional origin',
+                      items:
+                          card.regionalOrigin,
+                    ),
 
-                    if (card
-                        .regionalOrigin
-                        .isNotEmpty) ...[
-                      _sectionLabel(
-                        'Regional origin',
-                      ),
+                    CheeseInfoSection(
+                      title:
+                          'How people usually eat it',
+                      items: card
+                          .howPeopleUsuallyEatIt,
+                    ),
 
-                      _bulletList(
-                        card
-                            .regionalOrigin,
-                      ),
-                    ],
+                    CheeseInfoSection(
+                      title: 'Pairings',
+                      items: card.pairings,
+                    ),
 
-                    if (card
-                        .howPeopleUsuallyEatIt
-                        .isNotEmpty) ...[
-                      _sectionLabel(
-                        'How people usually eat it',
-                      ),
+                    CheeseInfoSection(
+                      title:
+                          'First impressions',
+                      items: card
+                          .firstImpressions,
+                      topSpacing: 28,
+                    ),
 
-                      _bulletList(
-                        card
-                            .howPeopleUsuallyEatIt,
-                      ),
-                    ],
+                    CheeseInfoSection(
+                      title: 'Ripeness',
+                      items: card.ripeness,
+                    ),
 
-                    if (card
-                        .pairings
-                        .isNotEmpty) ...[
-                      _sectionLabel(
-                        'Pairings',
-                      ),
+                    CheeseInfoSection(
+                      title:
+                          'Storage & serving',
+                      items: card
+                          .storageAndServing,
+                    ),
 
-                      _bulletList(
-                        card.pairings,
-                      ),
-                    ],
-
-                    if (card
-                        .firstImpressions
-                        .isNotEmpty) ...[
-                      _sectionLabel(
-                        'First impressions',
-                        top: 28,
-                      ),
-
-                      _bulletList(
-                        card
-                            .firstImpressions,
-                      ),
-                    ],
-
-                    if (card
-                        .ripeness
-                        .isNotEmpty) ...[
-                      _sectionLabel(
-                        'Ripeness',
-                      ),
-
-                      _bulletList(
-                        card
-                            .ripeness,
-                      ),
-                    ],
-
-                    if (card
-                        .storageAndServing
-                        .isNotEmpty) ...[
-                      _sectionLabel(
-                        'Storage & serving',
-                      ),
-
-                      _bulletList(
-                        card
-                            .storageAndServing,
-                      ),
-                    ],
-
-                    if (card
-                        .goodToKnow
-                        .isNotEmpty) ...[
-                      _sectionLabel(
-                        'Good to know',
-                      ),
-
-                      _bulletList(
-                        card
-                            .goodToKnow,
-                      ),
-                    ],
+                    CheeseInfoSection(
+                      title:
+                          'Good to know',
+                      items:
+                          card.goodToKnow,
+                    ),
 
                     if (card
                         .production
                         .isNotEmpty) ...[
-                      _sectionLabel(
-                        'Production',
+                      Padding(
+                        padding:
+                            const EdgeInsets
+                                .only(
+                          top: 20,
+                          bottom: 4,
+                        ),
+                        child: const Text(
+                          'Production',
+                          style: TextStyle(
+                            fontFamily:
+                                'SourceSans3',
+                            fontSize: 12,
+                            fontWeight:
+                                FontWeight
+                                    .w600,
+                            color: Colors
+                                .black87,
+                          ),
+                        ),
                       ),
 
                       Text(

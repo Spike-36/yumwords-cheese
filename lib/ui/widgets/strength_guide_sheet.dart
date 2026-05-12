@@ -6,6 +6,7 @@ void showStrengthGuideSheet(
 ) {
   showModalBottomSheet(
     context: context,
+    isScrollControlled: true,
     backgroundColor: Colors.white,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(
@@ -13,57 +14,80 @@ void showStrengthGuideSheet(
       ),
     ),
     builder: (_) {
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(
-          24,
-          28,
-          24,
-          36,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Strength Guide',
-              style: TextStyle(
-                fontFamily: 'SourceSans3',
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
+      return SizedBox(
+        height:
+            MediaQuery.of(context)
+                    .size
+                    .height *
+                0.55,
+        child: Padding(
+          padding:
+              const EdgeInsets.fromLTRB(
+            24,
+            28,
+            24,
+            36,
+          ),
+          child: Column(
+            mainAxisSize:
+                MainAxisSize.min,
+            children: [
+              const Text(
+                'Strength',
+                style: TextStyle(
+                  fontFamily:
+                      'SourceSans3',
+                  fontSize: 18,
+                  fontWeight:
+                      FontWeight.w600,
+                ),
               ),
-            ),
 
-            const SizedBox(height: 24),
+              const SizedBox(
+                height: 24,
+              ),
 
-            _StrengthRow(
-              number: '1',
-              label: 'very mild',
-              isActive: selectedStrength == '1',
-            ),
+              _StrengthRow(
+                number: '1',
+                label: 'very mild',
+                isActive:
+                    selectedStrength ==
+                        '1',
+              ),
 
-            _StrengthRow(
-              number: '2',
-              label: 'mild',
-              isActive: selectedStrength == '2',
-            ),
+              _StrengthRow(
+                number: '2',
+                label: 'mild',
+                isActive:
+                    selectedStrength ==
+                        '2',
+              ),
 
-            _StrengthRow(
-              number: '3',
-              label: 'medium',
-              isActive: selectedStrength == '3',
-            ),
+              _StrengthRow(
+                number: '3',
+                label: 'medium',
+                isActive:
+                    selectedStrength ==
+                        '3',
+              ),
 
-            _StrengthRow(
-              number: '4',
-              label: 'strong',
-              isActive: selectedStrength == '4',
-            ),
+              _StrengthRow(
+                number: '4',
+                label: 'strong',
+                isActive:
+                    selectedStrength ==
+                        '4',
+              ),
 
-            _StrengthRow(
-              number: '5',
-              label: 'very strong',
-              isActive: selectedStrength == '5',
-            ),
-          ],
+              _StrengthRow(
+                number: '5',
+                label: 'very strong',
+                isActive:
+                    selectedStrength ==
+                        '5',
+              ),
+            ],
+          ),
         ),
       );
     },
@@ -84,16 +108,21 @@ class _StrengthRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color =
-        isActive ? Colors.black87 : Colors.black26;
+        isActive
+            ? Colors.black87
+            : Colors.black26;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.only(
+        bottom: 14,
+      ),
       child: Row(
         children: [
           Container(
             width: 34,
             height: 34,
-            alignment: Alignment.center,
+            alignment:
+                Alignment.center,
             decoration: BoxDecoration(
               border: Border.all(
                 color: color,
@@ -103,9 +132,11 @@ class _StrengthRow extends StatelessWidget {
             child: Text(
               number,
               style: TextStyle(
-                fontFamily: 'SourceSans3',
+                fontFamily:
+                    'SourceSans3',
                 fontSize: 16,
-                fontWeight: FontWeight.w600,
+                fontWeight:
+                    FontWeight.w600,
                 color: color,
               ),
             ),
@@ -116,8 +147,9 @@ class _StrengthRow extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontFamily: 'SourceSans3',
-              fontSize: 18,
+              fontFamily:
+                  'SourceSans3',
+              fontSize: 16,
               color: color,
             ),
           ),

@@ -70,6 +70,7 @@ class Flashcard {
 
   // ✅ NEW FILTER FIELDS ADDED
   final String country;
+  final String region;
   final String milk;
   final String strength;
   final String rind;
@@ -124,6 +125,7 @@ class Flashcard {
 
     // ✅ NEW DEFAULTS
     this.country = '',
+    this.region = '',
     this.milk = '',
     this.strength = '',
     this.rind = '',
@@ -284,6 +286,7 @@ class Flashcard {
 
       // ✅ NEW FIELD MAPPING
       country: json['country']?.toString().toLowerCase() ?? '',
+      region: json['region']?.toString() ?? '',
       milk: json['milk']?.toString().toLowerCase() ?? '',
       strength: json['strength']?.toString().toLowerCase() ?? '',
       rind: json['rind']?.toString().toLowerCase() ?? '',
