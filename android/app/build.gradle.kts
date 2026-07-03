@@ -6,7 +6,9 @@ plugins {
 }
 
 android {
-    namespace = "com.yumwords.yumwords_th"
+    // 👉 UPDATED FOR YUMWORDS CHEESE
+    namespace = "com.yumwords.cheese"
+
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,10 +22,10 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.yumwords.yumwords_th"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+
+        // 👉 UPDATED FOR YUMWORDS CHEESE
+        applicationId = "com.yumwords.cheese"
+
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -32,8 +34,9 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+
+            // 👉 KEEPING DEBUG SIGNING FOR NOW
+            // 👉 SAFE FOR INTERNAL / CLOSED TESTING
             signingConfig = signingConfigs.getByName("debug")
         }
     }

@@ -1,6 +1,6 @@
 name: yumwords_cheese
 description: YumWords – Cheese
-version: 1.0.0+5
+version: 1.0.0+7
 publish_to: "none"
 
 environment:
@@ -23,6 +23,15 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^4.0.0
 
+  # 👉 NEW
+  flutter_launcher_icons: ^0.14.3
+
+# 👉 NEW
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/shared/icons/app_icon.png"
+
 flutter:
   uses-material-design: true
 
@@ -31,6 +40,7 @@ flutter:
     - assets/shared/images/ui/
     - assets/shared/flags/
     - assets/shared/maps/
+    - assets/shared/icons/
 
     # France
     # - assets/france/images/ui/

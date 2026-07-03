@@ -1,11 +1,10 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.yumwords.th">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Internet permission required for Flutter dev tools and network features -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:label="YumWords – Thailand"
+        android:label="YumWords Cheese"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 

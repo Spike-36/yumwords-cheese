@@ -18,7 +18,8 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller =
+      TextEditingController();
 
   String query = '';
 
@@ -74,32 +75,21 @@ class _SearchScreenState extends State<SearchScreen> {
     bool matchesText(Flashcard card) {
       if (q.isEmpty) return true;
 
-      return card.headword.toLowerCase().contains(q) ||
-          card.phonetic.toLowerCase().contains(q) ||
-          card.infoShortDescription.toLowerCase().contains(q);
-    }
-
-    bool matchesFilter(
-      String value,
-      Set<String> selected,
-    ) {
-      if (selected.isEmpty) return true;
-
-      return selected.contains(
-        value.toLowerCase(),
-      );
-    }
-
-    bool matchesRegion(Flashcard card) {
-      if (selectedRegions.isEmpty) return true;
-
-      return selectedRegions.contains(
-        card.region,
-      );
+      return card.headword
+              .toLowerCase()
+              .contains(q) ||
+          card.phonetic
+              .toLowerCase()
+              .contains(q) ||
+          card.infoShortDescription
+              .toLowerCase()
+              .contains(q);
     }
 
     bool matchesTypes(Flashcard card) {
-      if (selectedTypes.isEmpty) return true;
+      if (selectedTypes.isEmpty) {
+        return true;
+      }
 
       final cardTypes = card.types
           .map((e) => e.toLowerCase())
@@ -118,22 +108,47 @@ class _SearchScreenState extends State<SearchScreen> {
       }
 
       return selectedTypes.any(
-        (selected) =>
-            expandedTypes.contains(selected),
+        (selected) => expandedTypes
+            .contains(selected.toLowerCase()),
       );
     }
 
-    final results = widget.cards.where((card) {
+    bool matchesMilk(Flashcard card) {
+      if (selectedMilk.isEmpty) {
+        return true;
+      }
+
+      return selectedMilk.contains(
+        card.milk,
+      );
+    }
+
+    bool matchesStrength(Flashcard card) {
+      if (selectedStrength.isEmpty) {
+        return true;
+      }
+
+      return selectedStrength.contains(
+        card.strength,
+      );
+    }
+
+    bool matchesRegion(Flashcard card) {
+      if (selectedRegions.isEmpty) {
+        return true;
+      }
+
+      return selectedRegions.contains(
+        card.region,
+      );
+    }
+
+    final results =
+        widget.cards.where((card) {
       return matchesText(card) &&
           matchesTypes(card) &&
-          matchesFilter(
-            card.milk,
-            selectedMilk,
-          ) &&
-          matchesFilter(
-            card.strength,
-            selectedStrength,
-          ) &&
+          matchesMilk(card) &&
+          matchesStrength(card) &&
           matchesRegion(card);
     }).toList();
 
@@ -179,22 +194,17 @@ class _SearchScreenState extends State<SearchScreen> {
             spacing: 8,
             runSpacing: 8,
             children: options.map((option) {
-              final value =
-                  option.toLowerCase();
+              final isSelected =
+                  selectedSet.contains(option);
 
               return FilterChip(
-                key: ValueKey(
-                  '$title-$option-${selectedSet.contains(option)}',
-                ),
-
                 label: Text(option),
 
-                selected:
-                    selectedSet.contains(option),
+                selected: isSelected,
 
-                onSelected: (isSelected) {
+                onSelected: (selected) {
                   setState(() {
-                    if (isSelected) {
+                    if (selected) {
                       selectedSet.add(option);
                     } else {
                       selectedSet.remove(option);
@@ -212,24 +222,36 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   // ------------------------------------------------------------
+  // CLEAR FILTERS
+  // ------------------------------------------------------------
+  void _clearAllFilters() {
+    setState(() {
+      selectedTypes.clear();
+      selectedMilk.clear();
+      selectedStrength.clear();
+      selectedRegions.clear();
+      query = '';
+      _controller.clear();
+    });
+  }
+
+  // ------------------------------------------------------------
   // FILTER MODAL
   // ------------------------------------------------------------
   void _showFilters() {
     showModalBottomSheet(
-      useRootNavigator: true,
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
+      shape:
+          const RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.vertical(
           top: Radius.circular(20),
         ),
       ),
       builder: (context) {
         return StatefulBuilder(
-          key: ValueKey(
-            '${selectedTypes.join()}-${selectedMilk.join()}-${selectedStrength.join()}-${selectedRegions.join()}',
-          ),
           builder:
               (context, modalSetState) {
             return SafeArea(
@@ -268,19 +290,40 @@ class _SearchScreenState extends State<SearchScreen> {
                       const SizedBox(
                           height: 20),
 
-                      const Padding(
+                      Padding(
                         padding:
-                            EdgeInsets.symmetric(
+                            const EdgeInsets
+                                .symmetric(
                           horizontal: 16,
                         ),
-                        child: Text(
-                          'Filters',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight:
-                                FontWeight
-                                    .bold,
-                          ),
+                        child: Row(
+                          mainAxisAlignment:
+                              MainAxisAlignment
+                                  .spaceBetween,
+                          children: [
+                            const Text(
+                              'Filters',
+                              style:
+                                  TextStyle(
+                                fontSize:
+                                    20,
+                                fontWeight:
+                                    FontWeight
+                                        .bold,
+                              ),
+                            ),
+
+                            TextButton(
+                              onPressed: () {
+                                _clearAllFilters();
+                                modalSetState(
+                                    () {});
+                              },
+                              child: const Text(
+                                'Clear',
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 
@@ -478,7 +521,9 @@ class _SearchScreenState extends State<SearchScreen> {
                     Icons.tune,
                   ),
                   label:
-                      const Text('Filters'),
+                      const Text(
+                    'Filters',
+                  ),
                 ),
               ),
             ),
@@ -505,7 +550,8 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     return GridView.builder(
-      padding: const EdgeInsets.all(12),
+      padding:
+          const EdgeInsets.all(12),
       gridDelegate:
           const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
@@ -513,8 +559,10 @@ class _SearchScreenState extends State<SearchScreen> {
         mainAxisSpacing: 12,
         childAspectRatio: 0.85,
       ),
-      itemCount: filteredResults.length,
-      itemBuilder: (context, index) {
+      itemCount:
+          filteredResults.length,
+      itemBuilder:
+          (context, index) {
         final card =
             filteredResults[index];
 
@@ -528,25 +576,28 @@ class _SearchScreenState extends State<SearchScreen> {
                   cards:
                       filteredResults,
                   index: index,
-                  audio: widget.audio,
+                  audio:
+                      widget.audio,
                 ),
               ),
             );
           },
           child: Column(
             crossAxisAlignment:
-                CrossAxisAlignment.start,
+                CrossAxisAlignment
+                    .start,
             children: [
               Expanded(
                 child: ClipRRect(
                   borderRadius:
-                      BorderRadius.circular(
+                      BorderRadius
+                          .circular(
                     12,
                   ),
                   child: Image.asset(
                     'assets/cheese/images/words/${card.image}',
-                    width:
-                        double.infinity,
+                    width: double
+                        .infinity,
                     fit: BoxFit.cover,
                     errorBuilder:
                         (
@@ -577,10 +628,13 @@ class _SearchScreenState extends State<SearchScreen> {
                 card.headword,
                 maxLines: 2,
                 overflow:
-                    TextOverflow.ellipsis,
-                style: const TextStyle(
+                    TextOverflow
+                        .ellipsis,
+                style:
+                    const TextStyle(
                   fontWeight:
-                      FontWeight.w600,
+                      FontWeight
+                          .w600,
                   fontSize: 14,
                 ),
               ),

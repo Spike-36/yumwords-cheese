@@ -4,18 +4,20 @@ import '../data/card.dart';
 import '../services/audio_service.dart';
 import '../config/flavour.dart';
 import 'widgets/back_button_common.dart';
-import 'widgets/circle_icon_button.dart';
 import 'widgets/strength_guide_sheet.dart';
 import 'widgets/region_map_sheet.dart';
 import 'widgets/cheese_meta_row.dart';
 import 'widgets/cheese_info_section.dart';
 
-// 👉 CHANGED
-import 'search/search_screen.dart';
-
 class FeaturedFoodDetailScreen extends StatefulWidget {
   final int index;
+
+  // 👉 CURRENT VIEWING DATASET
   final List<Flashcard> cards;
+
+  // 👉 MASTER DATASET
+  final List<Flashcard>? allCards;
+
   final AudioService audio;
   final String languageCode;
   final bool autoAudio;
@@ -24,6 +26,10 @@ class FeaturedFoodDetailScreen extends StatefulWidget {
     super.key,
     required this.index,
     required this.cards,
+
+    // 👉 NEW
+    this.allCards,
+
     required this.audio,
     this.languageCode = 'en',
     this.autoAudio = false,
@@ -70,8 +76,6 @@ class _FeaturedFoodDetailScreenState
             .toLowerCase()
             .trim()) {
 
-      // 🔄 UPDATED TO MATCH DATABASE / JSON REGION NAMES EXACTLY
-
       case 'paris basin & northern heartland':
         return 'assets/shared/maps/france_region_paris_central_north.png';
 
@@ -97,8 +101,6 @@ class _FeaturedFoodDetailScreenState
         return 'assets/shared/maps/france_region_mediterranean_south_corsica.png';
 
       default:
-
-        // 👉 DEBUG OUTPUT FOR UNKNOWN REGION STRINGS
         debugPrint(
           '⚠️ Unknown region: $region',
         );
@@ -127,21 +129,6 @@ class _FeaturedFoodDetailScreenState
         ),
       );
     }
-  }
-
-  // 👉 CHANGED
-  void _openSearchScreen(
-    BuildContext context,
-  ) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => SearchScreen(
-          cards: widget.cards,
-          audio: widget.audio,
-        ),
-      ),
-    );
   }
 
   Widget _buildPage(
@@ -326,7 +313,6 @@ class _FeaturedFoodDetailScreenState
                           milkType,
                       strength:
                           strength,
-
                       onMapTap: () {
                         showRegionMapSheet(
                           context,
@@ -338,7 +324,6 @@ class _FeaturedFoodDetailScreenState
                               card.region,
                         );
                       },
-
                       onStrengthTap:
                           () {
                         showStrengthGuideSheet(
@@ -466,20 +451,6 @@ class _FeaturedFoodDetailScreenState
               Navigator.pop(context),
           topOffset:
               topInset + 12,
-        ),
-
-        Positioned(
-          top: topInset + 17,
-          right: 12,
-          child: CircleIconButton(
-            icon: Icons.search,
-
-            // 👉 CHANGED
-            onPressed: () =>
-                _openSearchScreen(
-              context,
-            ),
-          ),
         ),
       ],
     );

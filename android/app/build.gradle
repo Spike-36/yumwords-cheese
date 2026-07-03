@@ -13,7 +13,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     // 👉 YumWords – Thailand namespace
-    namespace "com.yumwords.th"
+    namespace "com.yumwords.cheese"
 
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
@@ -29,7 +29,7 @@ android {
 
     defaultConfig {
         // 👉 YumWords – Thailand applicationId (bundle ID)
-        applicationId "com.yumwords.th"
+        applicationId "com.yumwords.cheese"
 
         minSdk flutter.minSdkVersion
         targetSdk flutter.targetSdkVersion

@@ -10,12 +10,12 @@ import 'featured_food_detail_screen.dart';
 import 'search/search_screen.dart';
 
 // ------------------------------------------------------------
-// 🔒 LOCKED layout rules (do not auto-adjust)
+// 🔒 LOCKED layout rules
 // ------------------------------------------------------------
 const List<({int heroCount, int gridCount})> _layoutRules = [
-  (heroCount: 4, gridCount: 12),
+  (heroCount: 1, gridCount: 12),
   (heroCount: 1, gridCount: 10),
-  (heroCount: 2, gridCount: 4),
+  (heroCount: 1, gridCount: 4),
   (heroCount: 1, gridCount: 6),
   (heroCount: 1, gridCount: 6),
   (heroCount: 1, gridCount: 8),
@@ -40,16 +40,24 @@ class FeaturedFoodScreen extends StatefulWidget {
   State<FeaturedFoodScreen> createState() => _FeaturedFoodScreenState();
 }
 
-class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
-  String mode = 'type';
+class _FeaturedFoodScreenState
+    extends State<FeaturedFoodScreen> {
 
-  Map<String, List<Flashcard>> _buildFeaturedSections() {
-    final cardMap = {for (final c in widget.cards) c.id: c};
+  // ------------------------------------------------------------
+  // REGIONS ONLY
+  // ------------------------------------------------------------
+  Map<String, List<Flashcard>>
+      _buildFeaturedSections() {
 
-    final flavour =
-        mode == 'type' ? 'cheese_type' : 'cheese_country';
+    final cardMap = {
+      for (final c in widget.cards)
+        c.id: c,
+    };
 
-    final sections = getFeaturedSections(flavour);
+    final sections =
+        getFeaturedSections(
+      'cheese_country',
+    );
 
     return sections.map(
       (section, ids) => MapEntry(
@@ -62,8 +70,12 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
     );
   }
 
-  // 👉 CHANGED: DIRECT SEARCH SCREEN
-  void _openNavigatorMenu(BuildContext context) {
+  // ------------------------------------------------------------
+  // SEARCH
+  // ------------------------------------------------------------
+  void _openNavigatorMenu(
+    BuildContext context,
+  ) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -75,7 +87,9 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
     );
   }
 
-  // 🔄 FIXED: now takes index + list
+  // ------------------------------------------------------------
+  // OPEN CARD
+  // ------------------------------------------------------------
   void _openCard(
     BuildContext context,
     List<Flashcard> list,
@@ -84,12 +98,19 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => FeaturedFoodDetailScreen(
+        builder: (_) =>
+            FeaturedFoodDetailScreen(
           index: index,
           cards: list,
+
+          // 👉 IMPORTANT
+          allCards: widget.cards,
+
           audio: widget.audio,
-          languageCode: widget.languageCode,
-          autoAudio: widget.autoAudio,
+          languageCode:
+              widget.languageCode,
+          autoAudio:
+              widget.autoAudio,
         ),
       ),
     );
@@ -97,245 +118,306 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final sections = _buildFeaturedSections();
-    final sectionList = sections.entries.toList();
+    final sections =
+        _buildFeaturedSections();
+
+    final sectionList =
+        sections.entries.toList();
 
     return Scaffold(
       backgroundColor: Colors.white,
 
       appBar: AppBar(
-        toolbarHeight: 120,
-        automaticallyImplyLeading: false,
+        toolbarHeight: 84,
+        automaticallyImplyLeading:
+            false,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
 
-        title: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // 👉 top heading row with fixed centred title
-            SizedBox(
-              height: 36,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Center(
-                    child: Text(
-                      appTitle(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontFamily: 'BebasNeue',
-                        fontSize: 28,
-                        letterSpacing: 0.08,
-                      ),
-                    ),
+        title: SizedBox(
+          height: 36,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Center(
+                child: Text(
+                  appTitle(),
+                  textAlign:
+                      TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily:
+                        'BebasNeue',
+                    fontSize: 28,
+                    letterSpacing: 0.08,
                   ),
-
-                  Positioned(
-                    right: -10,
-                    top: -3,
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.search,
-                        color: Colors.black54,
-                      ),
-                      onPressed: () => _openNavigatorMenu(context),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            // 👉 segmented controls row
-            Transform.translate(
-              offset: const Offset(18, 8),
-              child: SizedBox(
-                width: 260,
-                child: ToggleButtons(
-                  constraints: const BoxConstraints(
-                    minWidth: 110,
-                    minHeight: 36,
-                  ),
-                  isSelected: [mode == 'country', mode == 'type'],
-                  onPressed: (index) {
-                    setState(() {
-                      mode = index == 0 ? 'country' : 'type';
-                    });
-                  },
-                  children: const [
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 0),
-                      child: Text(
-                        'REGIONS',
-                        style: TextStyle(
-                          fontSize: 11,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 0),
-                      child: Text(
-                        'TYPES',
-                        style: TextStyle(
-                          fontSize: 11,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
               ),
-            ),
-          ],
+
+              Positioned(
+                right: -10,
+                top: -3,
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.search,
+                    color: Colors.black54,
+                  ),
+                  onPressed: () =>
+                      _openNavigatorMenu(
+                    context,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
 
       body: ListView(
-        children: sectionList.asMap().entries.map((entry) {
-          final sectionIndex = entry.key;
-          final section = entry.value.key;
-          final sectionCards = entry.value.value;
+        children:
+            sectionList.asMap().entries.map(
+          (entry) {
+            final sectionIndex =
+                entry.key;
 
-          if (sectionCards.isEmpty) {
-            return const SizedBox.shrink();
-          }
+            final section =
+                entry.value.key;
 
-          final rule = sectionIndex < _layoutRules.length
-              ? _layoutRules[sectionIndex]
-              : _layoutRules.last;
+            final sectionCards =
+                entry.value.value;
 
-          final heroCards = sectionCards.take(rule.heroCount).toList();
+            if (sectionCards.isEmpty) {
+              return const SizedBox
+                  .shrink();
+            }
 
-          final gridCards = sectionCards
-              .skip(rule.heroCount)
-              .take(rule.gridCount)
-              .toList();
+            final rule = sectionIndex <
+                    _layoutRules.length
+                ? _layoutRules[
+                    sectionIndex]
+                : _layoutRules.last;
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // HEADER
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
-                child: Text(
-                  section.toUpperCase(),
-                  style: const TextStyle(
-                    fontFamily: 'BebasNeue',
-                    fontSize: 26,
-                    letterSpacing: 0.06,
+            final heroCards =
+                sectionCards
+                    .take(rule.heroCount)
+                    .toList();
+
+            final gridCards =
+                sectionCards
+                    .skip(rule.heroCount)
+                    .take(rule.gridCount)
+                    .toList();
+
+            return Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment
+                      .start,
+              children: [
+
+                // HEADER
+                Padding(
+                  padding:
+                      const EdgeInsets
+                          .fromLTRB(
+                    16,
+                    24,
+                    16,
+                    12,
+                  ),
+                  child: Text(
+                    section.toUpperCase(),
+                    style:
+                        const TextStyle(
+                      fontFamily:
+                          'BebasNeue',
+                      fontSize: 26,
+                      letterSpacing:
+                          0.06,
+                    ),
                   ),
                 ),
-              ),
 
-              // HERO
-              ...heroCards.asMap().entries.map((entry) {
-                final index = entry.key;
-                final card = entry.value;
+                // HERO
+                ...heroCards
+                    .asMap()
+                    .entries
+                    .map((entry) {
+                  final index =
+                      entry.key;
 
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                  child: GestureDetector(
-                    onTap: () => _openCard(context, heroCards, index),
+                  final card =
+                      entry.value;
 
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-
-                          child: AspectRatio(
-                            aspectRatio: 1,
-
-                            child: Image.asset(
-                              imageCountryPath(card.image),
-                              width: double.infinity,
-                              fit: BoxFit.cover,
+                  return Padding(
+                    padding:
+                        const EdgeInsets
+                            .fromLTRB(
+                      12,
+                      0,
+                      12,
+                      12,
+                    ),
+                    child:
+                        GestureDetector(
+                      onTap: () =>
+                          _openCard(
+                        context,
+                        heroCards,
+                        index,
+                      ),
+                      child: Column(
+                        crossAxisAlignment:
+                            CrossAxisAlignment
+                                .start,
+                        children: [
+                          ClipRRect(
+                            borderRadius:
+                                BorderRadius
+                                    .circular(
+                              10,
+                            ),
+                            child:
+                                AspectRatio(
+                              aspectRatio:
+                                  1,
+                              child:
+                                  Image.asset(
+                                imageCountryPath(
+                                  card.image,
+                                ),
+                                width: double
+                                    .infinity,
+                                fit: BoxFit
+                                    .cover,
+                              ),
                             ),
                           ),
-                        ),
 
-                        const SizedBox(height: 6),
-
-                        Text(
-                          card.headword,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                          const SizedBox(
+                            height: 6,
                           ),
-                        ),
-                      ],
+
+                          Text(
+                            card.headword,
+                            maxLines: 2,
+                            overflow:
+                                TextOverflow
+                                    .ellipsis,
+                            style:
+                                const TextStyle(
+                              fontSize: 14,
+                              fontWeight:
+                                  FontWeight
+                                      .w600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              }),
+                  );
+                }),
 
-              // GRID
-              if (gridCards.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-
-                  child: GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: gridCards.length,
-
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 0.85,
+                // GRID
+                if (gridCards.isNotEmpty)
+                  Padding(
+                    padding:
+                        const EdgeInsets
+                            .symmetric(
+                      horizontal: 12,
                     ),
+                    child:
+                        GridView.builder(
+                      shrinkWrap: true,
+                      physics:
+                          const NeverScrollableScrollPhysics(),
+                      itemCount:
+                          gridCards.length,
 
-                    itemBuilder: (context, index) {
-                      final card = gridCards[index];
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount:
+                            2,
+                        crossAxisSpacing:
+                            12,
+                        mainAxisSpacing:
+                            12,
+                        childAspectRatio:
+                            0.85,
+                      ),
 
-                      return GestureDetector(
-                        onTap: () =>
-                            _openCard(context, gridCards, index),
+                      itemBuilder:
+                          (
+                        context,
+                        index,
+                      ) {
+                        final card =
+                            gridCards[
+                                index];
 
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-
-                                child: Image.asset(
-                                  imageCountryPath(card.image),
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
+                        return GestureDetector(
+                          onTap: () =>
+                              _openCard(
+                            context,
+                            gridCards,
+                            index,
+                          ),
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment
+                                    .start,
+                            children: [
+                              Expanded(
+                                child:
+                                    ClipRRect(
+                                  borderRadius:
+                                      BorderRadius.circular(
+                                    10,
+                                  ),
+                                  child:
+                                      Image.asset(
+                                    imageCountryPath(
+                                      card.image,
+                                    ),
+                                    width:
+                                        double.infinity,
+                                    fit: BoxFit
+                                        .cover,
+                                  ),
                                 ),
                               ),
-                            ),
 
-                            const SizedBox(height: 6),
-
-                            Text(
-                              card.headword,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
+                              const SizedBox(
+                                height: 6,
                               ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
 
-              const SizedBox(height: 32),
-            ],
-          );
-        }).toList(),
+                              Text(
+                                card.headword,
+                                maxLines: 2,
+                                overflow:
+                                    TextOverflow
+                                        .ellipsis,
+                                style:
+                                    const TextStyle(
+                                  fontSize:
+                                      13,
+                                  fontWeight:
+                                      FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                const SizedBox(
+                  height: 32,
+                ),
+              ],
+            );
+          },
+        ).toList(),
       ),
     );
   }
