@@ -159,20 +159,44 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // HEADER
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
-                child: Text(
-                  topic.title.toUpperCase(),
-                  style: const TextStyle(
-                    fontFamily: 'BebasNeue',
-                    fontSize: 26,
-                    letterSpacing: 0.06,
-                  ),
-                ),
-              ),
+              // HEADER
+Padding(
+  padding: const EdgeInsets.fromLTRB(
+    16,
+    24,
+    16,
+    6,
+  ),
+  child: Text(
+    topic.title.toUpperCase(),
+    style: const TextStyle(
+      fontFamily: 'BebasNeue',
+      fontSize: 26,
+      letterSpacing: 0.06,
+    ),
+  ),
+),
 
-              // HERO
-              Padding(
+// DESCRIPTION
+Padding(
+  padding: const EdgeInsets.fromLTRB(
+    16,
+    0,
+    16,
+    14,
+  ),
+  child: Text(
+    topic.description,
+    style: const TextStyle(
+      fontSize: 15,
+      height: 1.35,
+      color: Colors.black87,
+    ),
+  ),
+),
+
+// HERO
+Padding(
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
                 child: GestureDetector(
                   onTap: () => _openCard(
