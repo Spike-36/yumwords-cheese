@@ -1,29 +1,19 @@
 import 'package:flutter/material.dart';
 
-import '../data/card.dart';
-import '../services/audio_service.dart';
 import '../config/flavour.dart';
-import '../data/featured/featured_registry.dart';
+import '../data/card.dart';
+import '../data/topics/topic.dart';
+import '../data/topics/topic_block.dart';
+import '../data/topics/topic_service.dart';
+import '../services/audio_service.dart';
+
 import 'featured_food_detail_screen.dart';
-
-// 👉 CHANGED
 import 'search/search_screen.dart';
-
-// ------------------------------------------------------------
-// 🔒 LOCKED layout rules
-// ------------------------------------------------------------
-const List<({int heroCount, int gridCount})> _layoutRules = [
-  (heroCount: 1, gridCount: 12),
-  (heroCount: 1, gridCount: 10),
-  (heroCount: 1, gridCount: 4),
-  (heroCount: 1, gridCount: 6),
-  (heroCount: 1, gridCount: 6),
-  (heroCount: 1, gridCount: 8),
-  (heroCount: 1, gridCount: 999),
-];
 
 class FeaturedFoodScreen extends StatefulWidget {
   final List<Flashcard> cards;
+  final List<Topic> topics;
+  final List<TopicBlock> topicBlocks;
   final AudioService audio;
   final String languageCode;
   final bool autoAudio;
@@ -31,6 +21,8 @@ class FeaturedFoodScreen extends StatefulWidget {
   const FeaturedFoodScreen({
     super.key,
     required this.cards,
+    required this.topics,
+    required this.topicBlocks,
     required this.audio,
     this.languageCode = 'en',
     this.autoAudio = false,
@@ -40,42 +32,45 @@ class FeaturedFoodScreen extends StatefulWidget {
   State<FeaturedFoodScreen> createState() => _FeaturedFoodScreenState();
 }
 
-class _FeaturedFoodScreenState
-    extends State<FeaturedFoodScreen> {
-
+class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
   // ------------------------------------------------------------
-  // REGIONS ONLY
+  // FEATURED TOPICS
   // ------------------------------------------------------------
-  Map<String, List<Flashcard>>
-      _buildFeaturedSections() {
-
-    final cardMap = {
-      for (final c in widget.cards)
-        c.id: c,
-    };
-
-    final sections =
-        getFeaturedSections(
-      'cheese_country',
+  List<_TopicSection> _buildFeaturedTopicSections() {
+    final topicService = TopicService(
+      topics: widget.topics,
+      topicBlocks: widget.topicBlocks,
+      cards: widget.cards,
     );
 
-    return sections.map(
-      (section, ids) => MapEntry(
-        section,
-        ids
-            .map((id) => cardMap[id])
-            .whereType<Flashcard>()
-            .toList(),
-      ),
-    );
+    final featuredTopics = topicService.featuredTopics();
+
+    return featuredTopics
+        .map((topic) {
+          final topicCards = topicService.cardsForTopic(topic.id);
+
+          if (topicCards.isEmpty) {
+            return null;
+          }
+
+          final heroCard = topicCards.first;
+          final gridCards = topicCards.skip(1).take(4).toList(growable: false);
+
+          return _TopicSection(
+            topic: topic,
+            topicCards: topicCards,
+            heroCard: heroCard,
+            gridCards: gridCards,
+          );
+        })
+        .whereType<_TopicSection>()
+        .toList(growable: false);
   }
 
   // ------------------------------------------------------------
   // SEARCH
   // ------------------------------------------------------------
-  void _openNavigatorMenu(
-    BuildContext context,
-  ) {
+  void _openNavigatorMenu(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -98,19 +93,13 @@ class _FeaturedFoodScreenState
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            FeaturedFoodDetailScreen(
+        builder: (_) => FeaturedFoodDetailScreen(
           index: index,
           cards: list,
-
-          // 👉 IMPORTANT
           allCards: widget.cards,
-
           audio: widget.audio,
-          languageCode:
-              widget.languageCode,
-          autoAudio:
-              widget.autoAudio,
+          languageCode: widget.languageCode,
+          autoAudio: widget.autoAudio,
         ),
       ),
     );
@@ -118,23 +107,16 @@ class _FeaturedFoodScreenState
 
   @override
   Widget build(BuildContext context) {
-    final sections =
-        _buildFeaturedSections();
-
-    final sectionList =
-        sections.entries.toList();
+    final sectionList = _buildFeaturedTopicSections();
 
     return Scaffold(
       backgroundColor: Colors.white,
-
       appBar: AppBar(
         toolbarHeight: 84,
-        automaticallyImplyLeading:
-            false,
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
-
         title: SizedBox(
           height: 36,
           child: Stack(
@@ -143,17 +125,14 @@ class _FeaturedFoodScreenState
               Center(
                 child: Text(
                   appTitle(),
-                  textAlign:
-                      TextAlign.center,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontFamily:
-                        'BebasNeue',
+                    fontFamily: 'BebasNeue',
                     fontSize: 28,
                     letterSpacing: 0.08,
                   ),
                 ),
               ),
-
               Positioned(
                 right: -10,
                 top: -3,
@@ -162,263 +141,147 @@ class _FeaturedFoodScreenState
                     Icons.search,
                     color: Colors.black54,
                   ),
-                  onPressed: () =>
-                      _openNavigatorMenu(
-                    context,
-                  ),
+                  onPressed: () => _openNavigatorMenu(context),
                 ),
               ),
             ],
           ),
         ),
       ),
-
       body: ListView(
-        children:
-            sectionList.asMap().entries.map(
-          (entry) {
-            final sectionIndex =
-                entry.key;
+        children: sectionList.map((section) {
+          final topic = section.topic;
+          final topicCards = section.topicCards;
+          final heroCard = section.heroCard;
+          final gridCards = section.gridCards;
 
-            final section =
-                entry.value.key;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // HEADER
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
+                child: Text(
+                  topic.title.toUpperCase(),
+                  style: const TextStyle(
+                    fontFamily: 'BebasNeue',
+                    fontSize: 26,
+                    letterSpacing: 0.06,
+                  ),
+                ),
+              ),
 
-            final sectionCards =
-                entry.value.value;
+              // HERO
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                child: GestureDetector(
+                  onTap: () => _openCard(
+                    context,
+                    topicCards,
+                    0,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: AspectRatio(
+                          aspectRatio: 1,
+                          child: Image.asset(
+                            imageCountryPath(heroCard.image),
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        heroCard.headword,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
 
-            if (sectionCards.isEmpty) {
-              return const SizedBox
-                  .shrink();
-            }
-
-            final rule = sectionIndex <
-                    _layoutRules.length
-                ? _layoutRules[
-                    sectionIndex]
-                : _layoutRules.last;
-
-            final heroCards =
-                sectionCards
-                    .take(rule.heroCount)
-                    .toList();
-
-            final gridCards =
-                sectionCards
-                    .skip(rule.heroCount)
-                    .take(rule.gridCount)
-                    .toList();
-
-            return Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment
-                      .start,
-              children: [
-
-                // HEADER
+              // GRID
+              if (gridCards.isNotEmpty)
                 Padding(
-                  padding:
-                      const EdgeInsets
-                          .fromLTRB(
-                    16,
-                    24,
-                    16,
-                    12,
-                  ),
-                  child: Text(
-                    section.toUpperCase(),
-                    style:
-                        const TextStyle(
-                      fontFamily:
-                          'BebasNeue',
-                      fontSize: 26,
-                      letterSpacing:
-                          0.06,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: gridCards.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 0.85,
                     ),
+                    itemBuilder: (context, index) {
+                      final card = gridCards[index];
+
+                      return GestureDetector(
+                        onTap: () => _openCard(
+                          context,
+                          topicCards,
+                          index + 1,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.asset(
+                                  imageCountryPath(card.image),
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              card.headword,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 ),
 
-                // HERO
-                ...heroCards
-                    .asMap()
-                    .entries
-                    .map((entry) {
-                  final index =
-                      entry.key;
-
-                  final card =
-                      entry.value;
-
-                  return Padding(
-                    padding:
-                        const EdgeInsets
-                            .fromLTRB(
-                      12,
-                      0,
-                      12,
-                      12,
-                    ),
-                    child:
-                        GestureDetector(
-                      onTap: () =>
-                          _openCard(
-                        context,
-                        heroCards,
-                        index,
-                      ),
-                      child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
-                        children: [
-                          ClipRRect(
-                            borderRadius:
-                                BorderRadius
-                                    .circular(
-                              10,
-                            ),
-                            child:
-                                AspectRatio(
-                              aspectRatio:
-                                  1,
-                              child:
-                                  Image.asset(
-                                imageCountryPath(
-                                  card.image,
-                                ),
-                                width: double
-                                    .infinity,
-                                fit: BoxFit
-                                    .cover,
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 6,
-                          ),
-
-                          Text(
-                            card.headword,
-                            maxLines: 2,
-                            overflow:
-                                TextOverflow
-                                    .ellipsis,
-                            style:
-                                const TextStyle(
-                              fontSize: 14,
-                              fontWeight:
-                                  FontWeight
-                                      .w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-
-                // GRID
-                if (gridCards.isNotEmpty)
-                  Padding(
-                    padding:
-                        const EdgeInsets
-                            .symmetric(
-                      horizontal: 12,
-                    ),
-                    child:
-                        GridView.builder(
-                      shrinkWrap: true,
-                      physics:
-                          const NeverScrollableScrollPhysics(),
-                      itemCount:
-                          gridCards.length,
-
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount:
-                            2,
-                        crossAxisSpacing:
-                            12,
-                        mainAxisSpacing:
-                            12,
-                        childAspectRatio:
-                            0.85,
-                      ),
-
-                      itemBuilder:
-                          (
-                        context,
-                        index,
-                      ) {
-                        final card =
-                            gridCards[
-                                index];
-
-                        return GestureDetector(
-                          onTap: () =>
-                              _openCard(
-                            context,
-                            gridCards,
-                            index,
-                          ),
-                          child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment
-                                    .start,
-                            children: [
-                              Expanded(
-                                child:
-                                    ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                    10,
-                                  ),
-                                  child:
-                                      Image.asset(
-                                    imageCountryPath(
-                                      card.image,
-                                    ),
-                                    width:
-                                        double.infinity,
-                                    fit: BoxFit
-                                        .cover,
-                                  ),
-                                ),
-                              ),
-
-                              const SizedBox(
-                                height: 6,
-                              ),
-
-                              Text(
-                                card.headword,
-                                maxLines: 2,
-                                overflow:
-                                    TextOverflow
-                                        .ellipsis,
-                                style:
-                                    const TextStyle(
-                                  fontSize:
-                                      13,
-                                  fontWeight:
-                                      FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                const SizedBox(
-                  height: 32,
-                ),
-              ],
-            );
-          },
-        ).toList(),
+              const SizedBox(height: 32),
+            ],
+          );
+        }).toList(),
       ),
     );
   }
+}
+
+class _TopicSection {
+  final Topic topic;
+  final List<Flashcard> topicCards;
+  final Flashcard heroCard;
+  final List<Flashcard> gridCards;
+
+  const _TopicSection({
+    required this.topic,
+    required this.topicCards,
+    required this.heroCard,
+    required this.gridCards,
+  });
 }

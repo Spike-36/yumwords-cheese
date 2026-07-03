@@ -37,12 +37,32 @@ class TopicService {
   List<Flashcard> cardsForTopic(String topicID) {
     final blocks = blocksForTopic(topicID);
 
-    return blocks.map((tb) {
-      return cards.firstWhere((c) => c.id == tb.blockID);
-    }).toList(growable: false);
+    final result = <Flashcard>[];
+
+    for (final block in blocks) {
+      final matches = cards.where((c) => c.id == block.blockID);
+
+      if (matches.isEmpty) {
+        print(
+          '*** MISSING FLASHCARD *** '
+          'topic=$topicID  blockID=${block.blockID}',
+        );
+        continue;
+      }
+
+      result.add(matches.first);
+    }
+
+    return result;
   }
 
   Flashcard heroCardForTopic(String topicID) {
-    return cardsForTopic(topicID).first;
+    final topicCards = cardsForTopic(topicID);
+
+    if (topicCards.isEmpty) {
+      throw Exception('Topic $topicID contains no valid cards.');
+    }
+
+    return topicCards.first;
   }
 }

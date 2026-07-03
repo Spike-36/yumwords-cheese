@@ -5,10 +5,9 @@ import '../data/repository.dart';
 import '../data/topics/topic.dart';
 import '../data/topics/topic_block.dart';
 import '../data/topics/topic_repository.dart';
-import '../data/topics/topic_service.dart';
 import '../services/audio_service.dart';
 
-import 'topic_screen.dart';
+import 'featured_food_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -19,7 +18,6 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   late final AudioService audio = AudioService();
-
   late final Future<_StartupData> startupFuture = _loadData();
 
   bool autoAudio = false;
@@ -28,7 +26,6 @@ class _MainScreenState extends State<MainScreen> {
     final cards = await Repository().load();
 
     final topicRepository = TopicRepository();
-
     final topics = await topicRepository.loadTopics();
     final topicBlocks = await topicRepository.loadTopicBlocks();
 
@@ -64,26 +61,16 @@ class _MainScreenState extends State<MainScreen> {
 
           if (!snapshot.hasData) {
             return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
+              body: Center(child: CircularProgressIndicator()),
             );
           }
 
           final data = snapshot.data!;
 
-          final topicService = TopicService(
+          return FeaturedFoodScreen(
+            cards: data.cards,
             topics: data.topics,
             topicBlocks: data.topicBlocks,
-            cards: data.cards,
-          );
-
-          final topic = data.topics.first;
-
-          return TopicScreen(
-            topic: topic,
-            topicCards: topicService.cardsForTopic(topic.id),
-            allCards: data.cards,
             audio: audio,
             languageCode: 'en',
             autoAudio: autoAudio,
