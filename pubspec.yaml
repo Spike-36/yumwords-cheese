@@ -53,6 +53,8 @@ flutter:
     - assets/cheese/images/words/
     - assets/cheese/audio/
     - assets/cheese/data.json
+    - assets/cheese/topics.json
+    - assets/cheese/topicBlocks.json
 
     # Other
     - assets/fonts/

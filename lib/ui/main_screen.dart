@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../data/repository.dart';
 import '../data/card.dart';
+import '../data/topics/topic_repository.dart';
 import '../services/audio_service.dart';
 
 import 'featured_food_screen.dart';
@@ -16,9 +17,22 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   late final AudioService audio = AudioService();
-  late final Future<List<Flashcard>> cardsFuture = Repository().load();
+
+  late final Future<List<Flashcard>> cardsFuture = _loadCards();
 
   bool autoAudio = false;
+
+  Future<List<Flashcard>> _loadCards() async {
+    final cards = await Repository().load();
+
+    final topicRepository = TopicRepository();
+
+    final topics = await topicRepository.loadTopics();
+    final topicBlocks = await topicRepository.loadTopicBlocks();
+
+
+    return cards;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +59,9 @@ class _MainScreenState extends State<MainScreen> {
 
           if (!snapshot.hasData) {
             return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
             );
           }
 
