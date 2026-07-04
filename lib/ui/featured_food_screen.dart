@@ -32,7 +32,26 @@ class FeaturedFoodScreen extends StatefulWidget {
   State<FeaturedFoodScreen> createState() => _FeaturedFoodScreenState();
 }
 
-class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
+class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   // ------------------------------------------------------------
   // FEATURED TOPICS
   // ------------------------------------------------------------
@@ -70,7 +89,7 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
   // ------------------------------------------------------------
   // SEARCH
   // ------------------------------------------------------------
-  void _openNavigatorMenu(BuildContext context) {
+  void _openSearch(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -105,10 +124,158 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildFeaturedTab(BuildContext context) {
     final sectionList = _buildFeaturedTopicSections();
 
+    return ListView(
+      key: const PageStorageKey<String>('featured_tab_scroll'),
+      children: sectionList.map((section) {
+        final topic = section.topic;
+        final topicCards = section.topicCards;
+        final heroCard = section.heroCard;
+        final gridCards = section.gridCards;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // HEADER
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 6),
+              child: Text(
+                topic.title.toUpperCase(),
+                style: const TextStyle(
+                  fontFamily: 'BebasNeue',
+                  fontSize: 26,
+                  letterSpacing: 0.06,
+                ),
+              ),
+            ),
+
+            // DESCRIPTION
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+              child: Text(
+                topic.description,
+                style: const TextStyle(
+                  fontSize: 15,
+                  height: 1.35,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+
+            // HERO
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              child: GestureDetector(
+                onTap: () => _openCard(
+                  context,
+                  topicCards,
+                  0,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: Image.asset(
+                          imageCountryPath(heroCard.image),
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      heroCard.headword,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // GRID
+            if (gridCards.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: gridCards.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.85,
+                  ),
+                  itemBuilder: (context, index) {
+                    final card = gridCards[index];
+
+                    return GestureDetector(
+                      onTap: () => _openCard(
+                        context,
+                        topicCards,
+                        index + 1,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.asset(
+                                imageCountryPath(card.image),
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            card.headword,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+            const SizedBox(height: 32),
+          ],
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildExploreTab(BuildContext context) {
+    // Temporary: this uses the existing combined search/filter screen.
+    // Next step is to split SearchScreen into:
+    // 1. keyword-only search for the magnifying glass
+    // 2. filter-led Explore tab
+    return SearchScreen(
+      key: const PageStorageKey<String>('explore_tab_scroll'),
+      cards: widget.cards,
+      audio: widget.audio,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -141,156 +308,35 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen> {
                     Icons.search,
                     color: Colors.black54,
                   ),
-                  onPressed: () => _openNavigatorMenu(context),
+                  onPressed: () => _openSearch(context),
                 ),
               ),
             ],
           ),
         ),
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: Colors.black,
+          unselectedLabelColor: Colors.black45,
+          indicatorColor: Colors.black,
+          indicatorWeight: 2,
+          labelStyle: const TextStyle(
+            fontFamily: 'BebasNeue',
+            fontSize: 20,
+            letterSpacing: 0.08,
+          ),
+          tabs: const [
+            Tab(text: 'FEATURED'),
+            Tab(text: 'EXPLORE'),
+          ],
+        ),
       ),
-      body: ListView(
-        children: sectionList.map((section) {
-          final topic = section.topic;
-          final topicCards = section.topicCards;
-          final heroCard = section.heroCard;
-          final gridCards = section.gridCards;
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // HEADER
-              // HEADER
-Padding(
-  padding: const EdgeInsets.fromLTRB(
-    16,
-    24,
-    16,
-    6,
-  ),
-  child: Text(
-    topic.title.toUpperCase(),
-    style: const TextStyle(
-      fontFamily: 'BebasNeue',
-      fontSize: 26,
-      letterSpacing: 0.06,
-    ),
-  ),
-),
-
-// DESCRIPTION
-Padding(
-  padding: const EdgeInsets.fromLTRB(
-    16,
-    0,
-    16,
-    14,
-  ),
-  child: Text(
-    topic.description,
-    style: const TextStyle(
-      fontSize: 15,
-      height: 1.35,
-      color: Colors.black87,
-    ),
-  ),
-),
-
-// HERO
-Padding(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                child: GestureDetector(
-                  onTap: () => _openCard(
-                    context,
-                    topicCards,
-                    0,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: AspectRatio(
-                          aspectRatio: 1,
-                          child: Image.asset(
-                            imageCountryPath(heroCard.image),
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        heroCard.headword,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // GRID
-              if (gridCards.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: gridCards.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 0.85,
-                    ),
-                    itemBuilder: (context, index) {
-                      final card = gridCards[index];
-
-                      return GestureDetector(
-                        onTap: () => _openCard(
-                          context,
-                          topicCards,
-                          index + 1,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.asset(
-                                  imageCountryPath(card.image),
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              card.headword,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-              const SizedBox(height: 32),
-            ],
-          );
-        }).toList(),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildFeaturedTab(context),
+          _buildExploreTab(context),
+        ],
       ),
     );
   }
