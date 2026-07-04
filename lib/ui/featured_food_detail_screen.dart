@@ -8,6 +8,7 @@ import 'widgets/strength_guide_sheet.dart';
 import 'widgets/region_map_sheet.dart';
 import 'widgets/cheese_meta_row.dart';
 import 'widgets/cheese_info_section.dart';
+import 'widgets/favorite_heart_button.dart';
 
 class FeaturedFoodDetailScreen extends StatefulWidget {
   final int index;
@@ -26,10 +27,7 @@ class FeaturedFoodDetailScreen extends StatefulWidget {
     super.key,
     required this.index,
     required this.cards,
-
-    // 👉 NEW
     this.allCards,
-
     required this.audio,
     this.languageCode = 'en',
     this.autoAudio = false,
@@ -40,8 +38,7 @@ class FeaturedFoodDetailScreen extends StatefulWidget {
       _FeaturedFoodDetailScreenState();
 }
 
-class _FeaturedFoodDetailScreenState
-    extends State<FeaturedFoodDetailScreen> {
+class _FeaturedFoodDetailScreenState extends State<FeaturedFoodDetailScreen> {
   late PageController _controller;
 
   @override
@@ -53,29 +50,26 @@ class _FeaturedFoodDetailScreenState
     );
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   String _audioPath(String? filename) {
     final f = (filename ?? '').trim();
 
-    return f.isEmpty
-        ? ''
-        : audioCountryPath(f);
+    return f.isEmpty ? '' : audioCountryPath(f);
   }
 
   String _imagePath(String? filename) {
     final f = (filename ?? '').trim();
 
-    return f.isEmpty
-        ? ''
-        : imageCountryPath(f);
+    return f.isEmpty ? '' : imageCountryPath(f);
   }
 
-  // 👉 FIXED REGION MAP LOOKUP
   String _regionMapPath(String region) {
-    switch (
-        region
-            .toLowerCase()
-            .trim()) {
-
+    switch (region.toLowerCase().trim()) {
       case 'paris basin & northern heartland':
         return 'assets/shared/maps/france_region_paris_central_north.png';
 
@@ -120,8 +114,7 @@ class _FeaturedFoodDetailScreenState
     } catch (_) {
       if (!context.mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
             'Audio not available',
@@ -137,33 +130,21 @@ class _FeaturedFoodDetailScreenState
   ) {
     final card = widget.cards[index];
 
-    final imgH =
-        MediaQuery.of(context)
-                .size
-                .height *
-            0.45;
+    final imgH = MediaQuery.of(context).size.height * 0.45;
 
-    final topInset =
-        MediaQuery.of(context)
-            .padding
-            .top;
+    final topInset = MediaQuery.of(context).padding.top;
 
     final hw = card.headword.trim();
 
     final hwFont = 'BebasNeue';
 
-    final phonetic =
-        card.phonetic.trim();
+    final phonetic = card.phonetic.trim();
 
-    final imgPath =
-        _imagePath(card.image);
+    final imgPath = _imagePath(card.image);
 
-    final audioPath =
-        _audioPath(card.audio);
+    final audioPath = _audioPath(card.audio);
 
-    final shortDesc =
-        card.infoShortDescription
-            .trim();
+    final shortDesc = card.infoShortDescription.trim();
 
     final strengthMap = {
       'very mild': '1',
@@ -173,84 +154,60 @@ class _FeaturedFoodDetailScreenState
       'very strong': '5',
     };
 
-    final strength =
-        strengthMap[
-                card.strength
-                    .toLowerCase()] ??
-            '?';
+    final strength = strengthMap[card.strength.toLowerCase()] ?? '?';
 
-    final milkType =
-        card.milk.isEmpty
-            ? '?'
-            : '${card.milk[0].toUpperCase()}${card.milk.substring(1)}';
+    final milkType = card.milk.isEmpty
+        ? '?'
+        : '${card.milk[0].toUpperCase()}${card.milk.substring(1)}';
 
     return Stack(
       children: [
         CustomScrollView(
           slivers: [
             SliverAppBar(
-              automaticallyImplyLeading:
-                  false,
+              automaticallyImplyLeading: false,
               expandedHeight: imgH,
-              backgroundColor:
-                  Colors.black,
-              flexibleSpace:
-                  FlexibleSpaceBar(
-                background:
-                    imgPath.isEmpty
-                        ? Container(
-                            color: Colors
-                                .black12,
-                          )
-                        : Image.asset(
-                            imgPath,
-                            fit: BoxFit
-                                .cover,
-                          ),
+              backgroundColor: Colors.black,
+              flexibleSpace: FlexibleSpaceBar(
+                background: imgPath.isEmpty
+                    ? Container(
+                        color: Colors.black12,
+                      )
+                    : Image.asset(
+                        imgPath,
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
-
             SliverToBoxAdapter(
               child: Padding(
-                padding:
-                    const EdgeInsets
-                        .fromLTRB(
+                padding: const EdgeInsets.fromLTRB(
                   24,
                   20,
                   24,
                   48,
                 ),
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     GestureDetector(
-                      onTap: () =>
-                          _safePlay(
+                      onTap: () => _safePlay(
                         context,
                         audioPath,
                       ),
                       child: SizedBox(
                         height: 44,
                         child: Stack(
-                          alignment:
-                              Alignment
-                                  .center,
+                          alignment: Alignment.center,
                           children: [
                             Center(
                               child: Text(
                                 hw,
-                                style:
-                                    TextStyle(
-                                  fontFamily:
-                                      hwFont,
-                                  fontSize:
-                                      30,
+                                style: TextStyle(
+                                  fontFamily: hwFont,
+                                  fontSize: 30,
                                 ),
-                                textAlign:
-                                    TextAlign
-                                        .center,
+                                textAlign: TextAlign.center,
                               ),
                             ),
                             const Positioned(
@@ -268,167 +225,114 @@ class _FeaturedFoodDetailScreenState
                               right: 0,
                               top: 10,
                               child: Icon(
-                                Icons
-                                    .volume_up,
+                                Icons.volume_up,
                                 size: 28,
-                                color: Colors
-                                    .black26,
+                                color: Colors.black26,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-
                     const SizedBox(
                       height: 6,
                     ),
-
-                    if (phonetic
-                        .isNotEmpty)
+                    if (phonetic.isNotEmpty)
                       Center(
                         child: Text(
-                          "[$phonetic]",
-                          style:
-                              const TextStyle(
-                            fontFamily:
-                                'CharisSIL',
+                          '[$phonetic]',
+                          style: const TextStyle(
+                            fontFamily: 'CharisSIL',
                             fontSize: 14,
-                            fontStyle:
-                                FontStyle
-                                    .italic,
-                            color:
-                                Colors
-                                    .grey,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey,
                           ),
                         ),
                       ),
-
                     const SizedBox(
                       height: 10,
                     ),
-
                     CheeseMetaRow(
-                      milkType:
-                          milkType,
-                      strength:
-                          strength,
+                      milkType: milkType,
+                      strength: strength,
                       onMapTap: () {
                         showRegionMapSheet(
                           context,
-                          mapAsset:
-                              _regionMapPath(
+                          mapAsset: _regionMapPath(
                             card.region,
                           ),
-                          regionName:
-                              card.region,
+                          regionName: card.region,
                         );
                       },
-                      onStrengthTap:
-                          () {
+                      onStrengthTap: () {
                         showStrengthGuideSheet(
                           context,
                           strength,
                         );
                       },
                     ),
-
                     const SizedBox(
                       height: 18,
                     ),
-
-                    if (shortDesc
-                        .isNotEmpty)
+                    if (shortDesc.isNotEmpty)
                       Padding(
-                        padding:
-                            const EdgeInsets
-                                .only(
+                        padding: const EdgeInsets.only(
                           top: 12,
                         ),
                         child: Text(
                           shortDesc,
                         ),
                       ),
-
                     CheeseInfoSection(
-                      title:
-                          'Where you’ll see it',
-                      items:
-                          card.whereYouWillSeeIt,
+                      title: 'Where you’ll see it',
+                      items: card.whereYouWillSeeIt,
                       topSpacing: 36,
                     ),
-
                     CheeseInfoSection(
-                      title:
-                          'Regional origin',
-                      items:
-                          card.regionalOrigin,
+                      title: 'Regional origin',
+                      items: card.regionalOrigin,
                     ),
-
                     CheeseInfoSection(
-                      title:
-                          'How people usually eat it',
-                      items: card
-                          .howPeopleUsuallyEatIt,
+                      title: 'How people usually eat it',
+                      items: card.howPeopleUsuallyEatIt,
                     ),
-
                     CheeseInfoSection(
                       title: 'Pairings',
                       items: card.pairings,
                     ),
-
                     CheeseInfoSection(
-                      title:
-                          'First impressions',
-                      items: card
-                          .firstImpressions,
+                      title: 'First impressions',
+                      items: card.firstImpressions,
                       topSpacing: 28,
                     ),
-
                     CheeseInfoSection(
                       title: 'Ripeness',
                       items: card.ripeness,
                     ),
-
                     CheeseInfoSection(
-                      title:
-                          'Storage & serving',
-                      items: card
-                          .storageAndServing,
+                      title: 'Storage & serving',
+                      items: card.storageAndServing,
                     ),
-
                     CheeseInfoSection(
-                      title:
-                          'Good to know',
-                      items:
-                          card.goodToKnow,
+                      title: 'Good to know',
+                      items: card.goodToKnow,
                     ),
-
-                    if (card
-                        .production
-                        .isNotEmpty) ...[
+                    if (card.production.isNotEmpty) ...[
                       Padding(
-                        padding:
-                            const EdgeInsets
-                                .only(
+                        padding: const EdgeInsets.only(
                           top: 20,
                           bottom: 4,
                         ),
                         child: const Text(
                           'Production',
                           style: TextStyle(
-                            fontFamily:
-                                'SourceSans3',
+                            fontFamily: 'SourceSans3',
                             fontSize: 15,
-                            fontWeight:
-                                FontWeight
-                                    .w600,
-                            color: Colors
-                                .black87,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
                           ),
                         ),
                       ),
-
                       Text(
                         card.production,
                         style: const TextStyle(
@@ -445,12 +349,16 @@ class _FeaturedFoodDetailScreenState
             ),
           ],
         ),
-
         BackButtonCommon(
-          onPressed: () =>
-              Navigator.pop(context),
-          topOffset:
-              topInset + 12,
+          onPressed: () => Navigator.pop(context),
+          topOffset: topInset + 12,
+        ),
+        Positioned(
+          top: topInset + 12,
+          right: 16,
+          child: FavoriteHeartButton(
+            card: card,
+          ),
         ),
       ],
     );
@@ -463,10 +371,8 @@ class _FeaturedFoodDetailScreenState
     return Scaffold(
       body: PageView.builder(
         controller: _controller,
-        itemCount:
-            widget.cards.length,
-        itemBuilder:
-            (context, index) {
+        itemCount: widget.cards.length,
+        itemBuilder: (context, index) {
           return _buildPage(
             context,
             index,

@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 
 import 'config/flavour.dart';
 import 'i18n/i18n.dart';
+import 'services/favorites_service.dart';
 import 'ui/main_screen.dart';
+
+final FavoritesService favoritesService = FavoritesService();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await I18n.load(); // Load i18n JSONs from assets before app runs
+
+  await I18n.load();
+  await favoritesService.load();
+
   runApp(const App());
 }
 
