@@ -7,6 +7,7 @@ import '../data/topics/topic_block.dart';
 import '../data/topics/topic_service.dart';
 import '../services/audio_service.dart';
 
+import 'explore/explore_screen.dart';
 import 'featured_food_detail_screen.dart';
 import 'search/search_screen.dart';
 
@@ -39,11 +40,7 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
   @override
   void initState() {
     super.initState();
-
-    _tabController = TabController(
-      length: 2,
-      vsync: this,
-    );
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -52,9 +49,6 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
     super.dispose();
   }
 
-  // ------------------------------------------------------------
-  // FEATURED TOPICS
-  // ------------------------------------------------------------
   List<_TopicSection> _buildFeaturedTopicSections() {
     final topicService = TopicService(
       topics: widget.topics,
@@ -62,33 +56,20 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
       cards: widget.cards,
     );
 
-    final featuredTopics = topicService.featuredTopics();
+    return topicService.featuredTopics().map((topic) {
+      final topicCards = topicService.cardsForTopic(topic.id);
 
-    return featuredTopics
-        .map((topic) {
-          final topicCards = topicService.cardsForTopic(topic.id);
+      if (topicCards.isEmpty) return null;
 
-          if (topicCards.isEmpty) {
-            return null;
-          }
-
-          final heroCard = topicCards.first;
-          final gridCards = topicCards.skip(1).take(4).toList(growable: false);
-
-          return _TopicSection(
-            topic: topic,
-            topicCards: topicCards,
-            heroCard: heroCard,
-            gridCards: gridCards,
-          );
-        })
-        .whereType<_TopicSection>()
-        .toList(growable: false);
+      return _TopicSection(
+        topic: topic,
+        topicCards: topicCards,
+        heroCard: topicCards.first,
+        gridCards: topicCards.skip(1).take(4).toList(growable: false),
+      );
+    }).whereType<_TopicSection>().toList(growable: false);
   }
 
-  // ------------------------------------------------------------
-  // SEARCH
-  // ------------------------------------------------------------
   void _openSearch(BuildContext context) {
     Navigator.push(
       context,
@@ -101,9 +82,6 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
     );
   }
 
-  // ------------------------------------------------------------
-  // OPEN CARD
-  // ------------------------------------------------------------
   void _openCard(
     BuildContext context,
     List<Flashcard> list,
@@ -138,7 +116,6 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // HEADER
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 24, 16, 6),
               child: Text(
@@ -150,8 +127,6 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
                 ),
               ),
             ),
-
-            // DESCRIPTION
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
               child: Text(
@@ -163,16 +138,10 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
                 ),
               ),
             ),
-
-            // HERO
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
               child: GestureDetector(
-                onTap: () => _openCard(
-                  context,
-                  topicCards,
-                  0,
-                ),
+                onTap: () => _openCard(context, topicCards, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -201,8 +170,6 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
                 ),
               ),
             ),
-
-            // GRID
             if (gridCards.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -220,11 +187,7 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
                     final card = gridCards[index];
 
                     return GestureDetector(
-                      onTap: () => _openCard(
-                        context,
-                        topicCards,
-                        index + 1,
-                      ),
+                      onTap: () => _openCard(context, topicCards, index + 1),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -254,7 +217,6 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
                   },
                 ),
               ),
-
             const SizedBox(height: 32),
           ],
         );
@@ -263,14 +225,12 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
   }
 
   Widget _buildExploreTab(BuildContext context) {
-    // Temporary: this uses the existing combined search/filter screen.
-    // Next step is to split SearchScreen into:
-    // 1. keyword-only search for the magnifying glass
-    // 2. filter-led Explore tab
-    return SearchScreen(
+    return ExploreScreen(
       key: const PageStorageKey<String>('explore_tab_scroll'),
       cards: widget.cards,
       audio: widget.audio,
+      languageCode: widget.languageCode,
+      autoAudio: widget.autoAudio,
     );
   }
 
