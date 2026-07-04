@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+
 import '../../data/card.dart';
-import '../featured_food_detail_screen.dart';
 import '../../services/audio_service.dart';
+import '../featured_food_detail_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   final List<Flashcard> cards;
@@ -18,144 +19,33 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final TextEditingController _controller =
-      TextEditingController();
+  final TextEditingController _controller = TextEditingController();
 
   String query = '';
 
-  // ------------------------------------------------------------
-  // FILTER STATE
-  // ------------------------------------------------------------
-  Set<String> selectedTypes = {};
-  Set<String> selectedMilk = {};
-  Set<String> selectedStrength = {};
-  Set<String> selectedRegions = {};
-
-  // ------------------------------------------------------------
-  // OPTIONS
-  // ------------------------------------------------------------
-  final List<String> typeOptions = [
-    'Soft',
-    'Semi-Soft / Semi-Hard',
-    'Hard',
-    'Blue',
-  ];
-
-  final List<String> milkOptions = [
-    'cow',
-    'goat',
-    'sheep',
-  ];
-
-  final List<String> strengthOptions = [
-    'very mild',
-    'mild',
-    'medium',
-    'strong',
-    'very strong',
-  ];
-
-  final List<String> regionOptions = [
-    'Normandy & Channel Coast',
-    'Paris Basin & Northern Heartland',
-    'Burgundy, Jura & Eastern France',
-    'Alps & Savoie',
-    'Auvergne & Central Mountains',
-    'Loire Valley & Western France',
-    'Southwest & Pyrenees',
-    'Mediterranean South & Corsica',
-  ];
-
-  // ------------------------------------------------------------
-  // FILTER LOGIC
-  // ------------------------------------------------------------
   List<Flashcard> get filteredResults {
     final q = query.toLowerCase().trim();
 
-    bool matchesText(Flashcard card) {
-      if (q.isEmpty) return true;
-
-      return card.headword
-              .toLowerCase()
-              .contains(q) ||
-          card.phonetic
-              .toLowerCase()
-              .contains(q) ||
-          card.infoShortDescription
-              .toLowerCase()
-              .contains(q);
+    if (q.isEmpty) {
+      return const [];
     }
 
-    bool matchesTypes(Flashcard card) {
-      if (selectedTypes.isEmpty) {
-        return true;
-      }
-
-      final cardTypes = card.types
-          .map((e) => e.toLowerCase())
-          .toList();
-
-      final expandedTypes = [...cardTypes];
-
-      if (cardTypes.contains('fresh')) {
-        expandedTypes.add('soft');
-      }
-
-      if (cardTypes.contains(
-          'semi-soft / semi-hard')) {
-        expandedTypes.add('semi-soft');
-        expandedTypes.add('semi-hard');
-      }
-
-      return selectedTypes.any(
-        (selected) => expandedTypes
-            .contains(selected.toLowerCase()),
-      );
+    bool matches(String value) {
+      return value.toLowerCase().contains(q);
     }
 
-    bool matchesMilk(Flashcard card) {
-      if (selectedMilk.isEmpty) {
-        return true;
-      }
-
-      return selectedMilk.contains(
-        card.milk,
-      );
-    }
-
-    bool matchesStrength(Flashcard card) {
-      if (selectedStrength.isEmpty) {
-        return true;
-      }
-
-      return selectedStrength.contains(
-        card.strength,
-      );
-    }
-
-    bool matchesRegion(Flashcard card) {
-      if (selectedRegions.isEmpty) {
-        return true;
-      }
-
-      return selectedRegions.contains(
-        card.region,
-      );
-    }
-
-    final results =
-        widget.cards.where((card) {
-      return matchesText(card) &&
-          matchesTypes(card) &&
-          matchesMilk(card) &&
-          matchesStrength(card) &&
-          matchesRegion(card);
+    final results = widget.cards.where((card) {
+      return matches(card.headword) ||
+          matches(card.phonetic) ||
+          matches(card.infoShortDescription) ||
+          matches(card.region) ||
+          matches(card.milk) ||
+          matches(card.strength) ||
+          card.types.any(matches);
     }).toList();
 
     results.sort(
-      (a, b) => a.headword
-          .toLowerCase()
-          .compareTo(
+      (a, b) => a.headword.toLowerCase().compareTo(
             b.headword.toLowerCase(),
           ),
     );
@@ -163,261 +53,28 @@ class _SearchScreenState extends State<SearchScreen> {
     return results;
   }
 
-  // ------------------------------------------------------------
-  // CHIP GROUP
-  // ------------------------------------------------------------
-  Widget buildChipGroup({
-    required String title,
-    required List<String> options,
-    required Set<String> selectedSet,
-    required VoidCallback refreshModal,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 6,
-      ),
-      child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: options.map((option) {
-              final isSelected =
-                  selectedSet.contains(option);
-
-              return FilterChip(
-                label: Text(option),
-
-                selected: isSelected,
-
-                onSelected: (selected) {
-                  setState(() {
-                    if (selected) {
-                      selectedSet.add(option);
-                    } else {
-                      selectedSet.remove(option);
-                    }
-                  });
-
-                  refreshModal();
-                },
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ------------------------------------------------------------
-  // CLEAR FILTERS
-  // ------------------------------------------------------------
-  void _clearAllFilters() {
-    setState(() {
-      selectedTypes.clear();
-      selectedMilk.clear();
-      selectedStrength.clear();
-      selectedRegions.clear();
-      query = '';
-      _controller.clear();
-    });
-  }
-
-  // ------------------------------------------------------------
-  // FILTER MODAL
-  // ------------------------------------------------------------
-  void _showFilters() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape:
-          const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(
-          top: Radius.circular(20),
+  void _openCard(
+    BuildContext context,
+    List<Flashcard> list,
+    int index,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FeaturedFoodDetailScreen(
+          cards: list,
+          index: index,
+          allCards: widget.cards,
+          audio: widget.audio,
         ),
       ),
-      builder: (context) {
-        return StatefulBuilder(
-          builder:
-              (context, modalSetState) {
-            return SafeArea(
-              child: Padding(
-                padding:
-                    const EdgeInsets.only(
-                  left: 8,
-                  right: 8,
-                  top: 12,
-                  bottom: 24,
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment
-                            .start,
-                    children: [
-                      Center(
-                        child: Container(
-                          width: 40,
-                          height: 5,
-                          decoration:
-                              BoxDecoration(
-                            color: Colors
-                                .grey
-                                .shade400,
-                            borderRadius:
-                                BorderRadius
-                                    .circular(
-                              20,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(
-                          height: 20),
-
-                      Padding(
-                        padding:
-                            const EdgeInsets
-                                .symmetric(
-                          horizontal: 16,
-                        ),
-                        child: Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment
-                                  .spaceBetween,
-                          children: [
-                            const Text(
-                              'Filters',
-                              style:
-                                  TextStyle(
-                                fontSize:
-                                    20,
-                                fontWeight:
-                                    FontWeight
-                                        .bold,
-                              ),
-                            ),
-
-                            TextButton(
-                              onPressed: () {
-                                _clearAllFilters();
-                                modalSetState(
-                                    () {});
-                              },
-                              child: const Text(
-                                'Clear',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(
-                          height: 12),
-
-                      buildChipGroup(
-                        title: 'Type',
-                        options:
-                            typeOptions,
-                        selectedSet:
-                            selectedTypes,
-                        refreshModal: () {
-                          modalSetState(
-                              () {});
-                        },
-                      ),
-
-                      buildChipGroup(
-                        title: 'Milk',
-                        options:
-                            milkOptions,
-                        selectedSet:
-                            selectedMilk,
-                        refreshModal: () {
-                          modalSetState(
-                              () {});
-                        },
-                      ),
-
-                      buildChipGroup(
-                        title: 'Strength',
-                        options:
-                            strengthOptions,
-                        selectedSet:
-                            selectedStrength,
-                        refreshModal: () {
-                          modalSetState(
-                              () {});
-                        },
-                      ),
-
-                      buildChipGroup(
-                        title: 'Region',
-                        options:
-                            regionOptions,
-                        selectedSet:
-                            selectedRegions,
-                        refreshModal: () {
-                          modalSetState(
-                              () {});
-                        },
-                      ),
-
-                      const SizedBox(
-                          height: 24),
-
-                      Padding(
-                        padding:
-                            const EdgeInsets
-                                .symmetric(
-                          horizontal: 16,
-                        ),
-                        child: SizedBox(
-                          width:
-                              double.infinity,
-                          child:
-                              ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(
-                                  context);
-                            },
-                            child: const Text(
-                              'Done',
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
     );
   }
 
-  // ------------------------------------------------------------
-  // BUILD
-  // ------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
+    final results = filteredResults;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -426,74 +83,61 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Column(
           children: [
             Padding(
-              padding:
-                  const EdgeInsets.only(
+              padding: const EdgeInsets.only(
                 left: 4,
                 top: 8,
               ),
               child: Align(
-                alignment:
-                    Alignment.centerLeft,
+                alignment: Alignment.centerLeft,
                 child: IconButton(
                   icon: const Icon(
                     Icons.arrow_back,
                     size: 26,
                   ),
-                  onPressed: () =>
-                      Navigator.pop(
-                    context,
-                  ),
+                  onPressed: () => Navigator.pop(context),
                 ),
               ),
             ),
-
             const SizedBox(height: 8),
-
             Padding(
-              padding:
-                  const EdgeInsets.fromLTRB(
+              padding: const EdgeInsets.fromLTRB(
                 16,
                 8,
                 16,
                 8,
               ),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  color:
-                      const Color(0xFFF2F2F2),
-                  borderRadius:
-                      BorderRadius.circular(
-                    12,
-                  ),
+                  color: const Color(0xFFF2F2F2),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   children: [
                     const Icon(
                       Icons.search,
                       size: 20,
+                      color: Color(0xFF8E8E93),
                     ),
-
-                    const SizedBox(
-                        width: 10),
-
+                    const SizedBox(width: 10),
                     Expanded(
                       child: TextField(
-                        controller:
-                            _controller,
-                        decoration:
-                            const InputDecoration(
-                          hintText:
-                              'Search cheeses',
-                          border:
-                              InputBorder.none,
+                        controller: _controller,
+                        autofocus: true,
+                        maxLines: 1,
+                        style: const TextStyle(
+                          height: 1.2,
                         ),
-                        onChanged:
-                            (value) {
+                        decoration: const InputDecoration(
+                          hintText: 'Search cheeses',
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        onChanged: (value) {
                           setState(() {
                             query = value;
                           });
@@ -504,34 +148,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ),
             ),
-
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(
-                horizontal: 16,
-              ),
-              child: Align(
-                alignment:
-                    Alignment.centerLeft,
-                child:
-                    OutlinedButton.icon(
-                  onPressed:
-                      _showFilters,
-                  icon: const Icon(
-                    Icons.tune,
-                  ),
-                  label:
-                      const Text(
-                    'Filters',
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 6),
-
+            const SizedBox(height: 8),
             Expanded(
-              child: _buildResults(),
+              child: _buildResults(results),
             ),
           ],
         ),
@@ -539,81 +158,61 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  // ------------------------------------------------------------
-  // RESULTS GRID
-  // ------------------------------------------------------------
-  Widget _buildResults() {
-    if (filteredResults.isEmpty) {
+  Widget _buildResults(List<Flashcard> results) {
+    if (query.trim().isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    if (results.isEmpty) {
       return const Center(
-        child: Text('No results'),
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Text(
+            'No results found',
+            textAlign: TextAlign.center,
+          ),
+        ),
       );
     }
 
     return GridView.builder(
-      padding:
-          const EdgeInsets.all(12),
-      gridDelegate:
-          const SliverGridDelegateWithFixedCrossAxisCount(
+      padding: const EdgeInsets.all(12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
         childAspectRatio: 0.85,
       ),
-      itemCount:
-          filteredResults.length,
-      itemBuilder:
-          (context, index) {
-        final card =
-            filteredResults[index];
+      itemCount: results.length,
+      itemBuilder: (context, index) {
+        final card = results[index];
 
         return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) =>
-                    FeaturedFoodDetailScreen(
-                  cards:
-                      filteredResults,
-                  index: index,
-                  audio:
-                      widget.audio,
-                ),
-              ),
-            );
-          },
+          onTap: () => _openCard(
+            context,
+            results,
+            index,
+          ),
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment
-                    .start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: ClipRRect(
-                  borderRadius:
-                      BorderRadius
-                          .circular(
-                    12,
-                  ),
+                  borderRadius: BorderRadius.circular(12),
                   child: Image.asset(
                     'assets/cheese/images/words/${card.image}',
-                    width: double
-                        .infinity,
+                    width: double.infinity,
                     fit: BoxFit.cover,
-                    errorBuilder:
-                        (
+                    errorBuilder: (
                       context,
                       error,
                       stackTrace,
                     ) {
                       return Container(
-                        color: Colors
-                            .grey
-                            .shade200,
-                        child:
-                            const Center(
+                        color: Colors.grey.shade200,
+                        child: const Center(
                           child: Icon(
-                            Icons
-                                .image_not_supported,
+                            Icons.image_not_supported,
                           ),
                         ),
                       );
@@ -621,20 +220,13 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 6),
-
               Text(
                 card.headword,
                 maxLines: 2,
-                overflow:
-                    TextOverflow
-                        .ellipsis,
-                style:
-                    const TextStyle(
-                  fontWeight:
-                      FontWeight
-                          .w600,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
               ),
