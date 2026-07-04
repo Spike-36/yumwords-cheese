@@ -10,6 +10,7 @@ import '../services/audio_service.dart';
 import 'explore/explore_screen.dart';
 import 'featured_food_detail_screen.dart';
 import 'search/search_screen.dart';
+import 'widgets/favorite_heart_button.dart';
 
 class FeaturedFoodScreen extends StatefulWidget {
   final List<Flashcard> cards;
@@ -149,10 +150,21 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
                       borderRadius: BorderRadius.circular(10),
                       child: AspectRatio(
                         aspectRatio: 1,
-                        child: Image.asset(
-                          imageCountryPath(heroCard.image),
-                          width: double.infinity,
-                          fit: BoxFit.cover,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Image.asset(
+                              imageCountryPath(heroCard.image),
+                              fit: BoxFit.cover,
+                            ),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: FavoriteHeartButton(
+                                card: heroCard,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -194,10 +206,22 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
                           Expanded(
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: Image.asset(
-                                imageCountryPath(card.image),
-                                width: double.infinity,
-                                fit: BoxFit.cover,
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  Image.asset(
+                                    imageCountryPath(card.image),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: FavoriteHeartButton(
+                                      card: card,
+                                      size: 24,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
