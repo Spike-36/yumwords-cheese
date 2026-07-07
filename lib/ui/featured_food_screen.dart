@@ -5,6 +5,7 @@ import '../data/card.dart';
 import '../data/topics/topic.dart';
 import '../data/topics/topic_block.dart';
 import '../data/topics/topic_service.dart';
+import '../main.dart';
 import '../services/audio_service.dart';
 
 import 'explore/explore_screen.dart';
@@ -41,7 +42,7 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -146,27 +147,28 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            Image.asset(
+                    Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: AspectRatio(
+                            aspectRatio: 1,
+                            child: Image.asset(
                               imageCountryPath(heroCard.image),
+                              width: double.infinity,
                               fit: BoxFit.cover,
                             ),
-                            Positioned(
-                              top: 8,
-                              right: 8,
-                              child: FavoriteHeartButton(
-                                card: heroCard,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: FavoriteHeartButton(
+                            card: heroCard,
+                            size: 22,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 6),
                     Text(
@@ -204,25 +206,25 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  Image.asset(
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.asset(
                                     imageCountryPath(card.image),
+                                    width: double.infinity,
                                     fit: BoxFit.cover,
                                   ),
-                                  Positioned(
-                                    top: 8,
-                                    right: 8,
-                                    child: FavoriteHeartButton(
-                                      card: card,
-                                      size: 24,
-                                    ),
+                                ),
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: FavoriteHeartButton(
+                                    card: card,
+                                    size: 20,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -245,6 +247,75 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
           ],
         );
       }).toList(),
+    );
+  }
+
+  Widget _buildFavoritesTab(BuildContext context) {
+    return AnimatedBuilder(
+      animation: favoritesService,
+      builder: (context, _) {
+        final favoriteCards = widget.cards
+            .where((card) => favoritesService.isFavorite(card.id))
+            .toList(growable: false);
+
+        if (favoriteCards.isEmpty) {
+          return const Center(
+            child: Text(
+              'No favourites yet',
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.black54,
+              ),
+            ),
+          );
+        }
+
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(12, 20, 12, 12),
+          child: GridView.builder(
+            key: const PageStorageKey<String>('favorites_tab_scroll'),
+            itemCount: favoriteCards.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 0.85,
+            ),
+            itemBuilder: (context, index) {
+              final card = favoriteCards[index];
+
+              return GestureDetector(
+                onTap: () => _openCard(context, favoriteCards, index),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset(
+                          imageCountryPath(card.image),
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      card.headword,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -311,6 +382,7 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
           ),
           tabs: const [
             Tab(text: 'FEATURED'),
+            Tab(text: 'FAVOURITES'),
             Tab(text: 'EXPLORE'),
           ],
         ),
@@ -319,6 +391,7 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
         controller: _tabController,
         children: [
           _buildFeaturedTab(context),
+          _buildFavoritesTab(context),
           _buildExploreTab(context),
         ],
       ),
