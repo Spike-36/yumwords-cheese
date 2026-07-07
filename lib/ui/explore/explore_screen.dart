@@ -4,6 +4,7 @@ import '../../config/flavour.dart';
 import '../../data/card.dart';
 import '../../services/audio_service.dart';
 import '../featured_food_detail_screen.dart';
+import '../widgets/favorite_heart_button.dart';
 
 class ExploreScreen extends StatefulWidget {
   final List<Flashcard> cards;
@@ -335,27 +336,39 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            imageCountryPath(card.image),
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (
-                              context,
-                              error,
-                              stackTrace,
-                            ) {
-                              return Container(
-                                color: Colors.grey.shade200,
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.image_not_supported,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.asset(
+                                imageCountryPath(card.image),
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (
+                                  context,
+                                  error,
+                                  stackTrace,
+                                ) {
+                                  return Container(
+                                    color: Colors.grey.shade200,
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.image_not_supported,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            Positioned(
+                              top: 4,
+                              right: 4,
+                              child: FavoriteHeartButton(
+                                card: card,
+                                size: 20,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 6),

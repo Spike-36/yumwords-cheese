@@ -49,3 +49,11 @@ String sharedUi(String fileName) {
 String countryUi(String fileName) {
   return 'assets/cheese/images/ui/$fileName';
 }
+// ------------------------------------------------------------
+// FLAG IMAGES
+// ------------------------------------------------------------
+String flagCountryPath(String countryCode) {
+  final clean = countryCode.trim().toLowerCase();
+  if (clean.isEmpty) return '';
+  return 'assets/shared/flags/$clean.png';
+}

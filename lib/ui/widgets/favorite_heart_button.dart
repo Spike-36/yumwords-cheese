@@ -29,17 +29,20 @@ class FavoriteHeartButton extends StatelessWidget {
             width: 44,
             height: 44,
             child: Center(
-              child: Icon(
-                isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: isFavorite ? Colors.redAccent : Colors.white,
-                size: size,
-                shadows: const [
-                  Shadow(
-                    blurRadius: 6,
-                    color: Colors.black54,
-                    offset: Offset(0, 1),
+              child: Container(
+                width: size + 10,
+                height: size + 10,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.black.withOpacity(0.35),
+                ),
+                child: Center(
+                  child: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: Colors.white,
+                    size: size,
                   ),
-                ],
+                ),
               ),
             ),
           ),

@@ -51,6 +51,16 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
     super.dispose();
   }
 
+  String _titleCase(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return trimmed;
+
+    return trimmed.split(RegExp(r'\s+')).map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1);
+    }).join(' ');
+  }
+
   List<_TopicSection> _buildFeaturedTopicSections() {
     final topicService = TopicService(
       topics: widget.topics,
@@ -171,13 +181,47 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
                       ],
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      heroCard.headword,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                    SizedBox(
+                      height: 48,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 22,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 1.5,
+                              ),
+                            ),
+                            child: ClipOval(
+                              child: Image.asset(
+                                flagCountryPath(heroCard.country),
+                                width: 22,
+                                height: 22,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const SizedBox(width: 22, height: 22);
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _titleCase(heroCard.headword),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: -0.2,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -228,13 +272,47 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
                             ),
                           ),
                           const SizedBox(height: 6),
-                          Text(
-                            card.headword,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
+                          SizedBox(
+                            height: 38,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: ClipOval(
+                                    child: Image.asset(
+                                      flagCountryPath(card.country),
+                                      width: 20,
+                                      height: 20,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return const SizedBox(width: 20, height: 20);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 7),
+                                Expanded(
+                                  child: Text(
+                                    _titleCase(card.headword),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: -0.2,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -256,7 +334,12 @@ class _FeaturedFoodScreenState extends State<FeaturedFoodScreen>
       builder: (context, _) {
         final favoriteCards = widget.cards
             .where((card) => favoritesService.isFavorite(card.id))
-            .toList(growable: false);
+            .toList(growable: false)
+          ..sort(
+            (a, b) => a.headword.toLowerCase().compareTo(
+                  b.headword.toLowerCase(),
+                ),
+          );
 
         if (favoriteCards.isEmpty) {
           return const Center(
